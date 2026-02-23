@@ -24,3 +24,13 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 ## Learnings
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
+
+### 2026-02-23: Frontend Shell Implementation
+- **Architecture**: Reducer-based state management with `useSimulation` hook provides clean separation between UI and business logic
+- **Grid rendering**: Adaptive cell sizing (20-40px) based on grid dimensions ensures optimal display for various grid sizes
+- **Component structure**: Left panel (grid + controls) / Right panel (stats) layout works well for desktop-first simulation UX
+- **SignalR integration**: Auto-reconnect pattern with `useRef` prevents connection loss during long-running simulations
+- **File operations**: Save uses blob download with dynamic filename; Load uses hidden input pattern for cleaner UI
+- **Lambert coordination**: StatsPanel already implemented with graph components; preserved existing work while adding required population display
+- **TypeScript**: Strict typing with `simulation.types.ts` catches API contract mismatches at compile time
+- **Ready for SVGs**: GridCell uses color mapping as placeholders; switching to Lambert's SVG components only requires updating the switch/map logic

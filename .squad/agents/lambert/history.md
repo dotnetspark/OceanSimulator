@@ -33,3 +33,9 @@ Color palette must be consistent across SVGs and graphs. All species share a vis
 ## Learnings
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
+
+- **2026-02-23**: SVG animations in React work best with CSS keyframes embedded in `<style>` tags within the SVG. Using `animationEnabled` prop allows users to toggle animations for performance or accessibility. Each species has a distinct animation signature (pulse, sway, fin movement) to reinforce visual identity.
+
+- **2026-02-23**: Color palette consistency is critical across SVGs and Recharts. Using a centralized `palette.ts` ensures species colors match in both grid cells and population graphs, creating visual coherence.
+
+- **2026-02-23**: Dead variants use desaturated colors + X-eyes visual metaphor. This clearly communicates state without animation, saving render cycles.

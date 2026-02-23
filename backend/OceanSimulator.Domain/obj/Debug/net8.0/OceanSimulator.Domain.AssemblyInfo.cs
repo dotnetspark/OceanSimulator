@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OceanSimulator.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bacf6e0ce7a74af10476dbc53f1791ff43ce4dc")]
 [assembly: System.Reflection.AssemblyProductAttribute("OceanSimulator.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OceanSimulator.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

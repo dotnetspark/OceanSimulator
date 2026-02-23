@@ -109,3 +109,4 @@ C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Tests\obj\Debu
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Tests\obj\Debug\net8.0\OceanSimulator.Tests.pdb
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Tests\obj\Debug\net8.0\OceanSimulator.Tests.genruntimeconfig.cache
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Tests\obj\Debug\net8.0\ref\OceanSimulator.Tests.dll
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Tests\obj\Debug\net8.0\OceanSimulator.Tests.sourcelink.json
