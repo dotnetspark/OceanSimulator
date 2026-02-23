@@ -40,3 +40,21 @@ End-to-End (Playwright):
 ## Learnings
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
+
+### 2026-02-23: Playwright E2E test suite (PR #25)
+- 10 comprehensive E2E test cases covering full user workflows
+- TC1-10 validate: config form, grid initialization, snapshot execution, graph updates, save/load, extinction logic, layout panels
+- Playwright config with auto-start dev server (webServer: npm run dev at localhost:5173)
+- data-testid attributes surgically added to all interactive elements without breaking existing code
+- ConfigPanel: input-rows, input-cols, input-plankton, input-sardines, input-sharks, input-crabs, input-reefs, btn-start
+- SimulationControls: btn-run-one, btn-run-n, input-n, btn-run-extinction, btn-run-event, btn-save, input-load-file, snapshot-number
+- OceanGrid: ocean-grid, cell-{row}-{col} for each cell (position-aware)
+- StatsPanel: stats-panel, count-{species} for each species card, population-graph, birth-death-graph
+- App.tsx: left-panel, right-panel
+- GridCell updated to accept Cell object instead of just SpecimenType for position data
+- npm scripts: test:e2e (headless), test:e2e:ui (interactive)
+- Chromium browser installed via npx playwright install chromium
+- Tests validate state persistence round-trip (save → reload → restore)
+- Extinction test validates simulation stops when species extinct (small grid, high predator density)
+- Graph tests validate Recharts SVG rendering after N snapshots
+- Branch: squad/18-playwright-e2e based on squad/8-9-10-11-frontend
