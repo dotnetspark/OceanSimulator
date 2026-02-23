@@ -89,6 +89,7 @@ export function useSimulation() {
     } catch (error) {
       console.error('Failed to initialize:', error);
       dispatch({ type: 'RUNNING', isRunning: false });
+      throw error; // re-throw so App.tsx can show the error banner
     }
   };
 

@@ -1,0 +1,79 @@
+/* Shared animation keyframes for all species SVGs */
+
+/* State transition animations */
+@keyframes born {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes dying {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes moving {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.4); }
+}
+
+/* Species-specific idle animations */
+@keyframes planktonPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes sardineWave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(3deg); }
+  75% { transform: rotate(-3deg); }
+}
+
+@keyframes sharkGlide {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(1px); }
+}
+
+@keyframes crabPinch {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03) rotate(-2deg); }
+}
+
+/* State classes - apply to animated group */
+.species-born {
+  transform-origin: center;
+  animation: born 400ms ease-out forwards;
+}
+
+.species-dying {
+  animation: dying 600ms ease-in forwards;
+}
+
+.species-moving {
+  animation: moving 200ms ease-out;
+}
+
+/* Idle animation classes */
+.plankton-idle {
+  transform-origin: center;
+  animation: planktonPulse 2s ease-in-out infinite;
+}
+
+.sardine-idle {
+  transform-origin: center;
+  animation: sardineWave 1.2s ease-in-out infinite;
+}
+
+.shark-idle {
+  transform-origin: center;
+  animation: sharkGlide 2.5s ease-in-out infinite;
+}
+
+.crab-idle {
+  transform-origin: center;
+  animation: crabPinch 2s ease-in-out infinite;
+}
+
+/* Pause modifier */
+.anim-paused {
+  animation-play-state: paused !important;
+}

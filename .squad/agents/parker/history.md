@@ -56,3 +56,22 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 - **StatsPanel redesign**: Species cards now show emojis with counts in a more compact 2-column grid; better visual hierarchy
 - **Color consistency**: All components now consistently use palette.background, palette.panelBg, palette.accent, and species colors
 - **UX improvements**: Sliders for intuitive value selection, visual running state feedback, clearer button labels with icons, better spacing and visual grouping
+
+### 2026-02-24: Tailwind CSS Migration + UX Improvements
+
+- **Tailwind migration**: Converted all key components from inline styles to Tailwind utility classes while preserving exact visual appearance
+- **Components converted**: App.tsx (header, layout, error banner), GridCell.tsx, OceanGrid.tsx, StatsPanel.tsx, SimulationControls.tsx (container, GroupLabel, running indicator)
+- **Smart hybrid approach**: Used Tailwind for static styles; kept inline `style={{}}` only where dynamic values required (grid column ratios, cell dimensions)
+- **Color palette preserved**: Maintained existing color system using Tailwind arbitrary values like `bg-[#0a1628]`, `text-[#00b4d8]`, `border-[rgba(0,180,216,0.2)]`
+- **Animation cleanup**: Removed inline `@keyframes pulse` from SimulationControls; replaced with Tailwind's built-in `animate-pulse` class for running indicator
+- **Animations import**: Added `@import './styles/animations.css'` at top of `index.css` (before @tailwind directives) to support Lambert's CSS animations for cell state changes
+- **Grid sizing fix**: Improved OceanGrid cell sizing from hardcoded 600px reference to viewport-based calculation (`window.innerWidth * 0.60` / `window.innerHeight * 0.85`) — cells now scale properly to available space (18-52px range instead of 20-40px)
+- **TypeScript compliance**: All changes pass `tsc --noEmit` with strict mode + verbatimModuleSyntax enabled
+- **Maintainability win**: Tailwind utility classes reduce visual noise, improve consistency, and make responsive design easier if needed later
+
+### 2026-02-23: Tailwind Migration + Grid Scaling Fix + Lambert Coordination
+- **Tailwind migration completed**: Converted App, GridCell, OceanGrid, StatsPanel, SimulationControls to Tailwind utility classes; preserved exact visual appearance
+- **Critical UX win**: Grid cell sizing now viewport-aware (18-52px range, scales to actual window dimensions) instead of hardcoded 600px; on 1440px screens, cells now ~46px vs. 30px before
+- **Animation import**: Added `@import './styles/animations.css'` to `index.css` before @tailwind directives, enabling Lambert's CSS animations for cell state changes via `data-anim` attributes
+- **Cross-agent**: Lambert completed SVG CSS refactor (centralized keyframes, removed 400+ duplicate style tags), redesigned species for readability, improved charts (split Prey/Predators, mirrored BirthDeathGraph)
+- **TypeScript compliance**: Zero errors with strict mode + verbatimModuleSyntax

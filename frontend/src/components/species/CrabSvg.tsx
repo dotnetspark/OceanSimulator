@@ -1,33 +1,26 @@
-interface SpeciesSvgProps {
-  size?: number;
-  colorTheme?: 'default' | 'high-contrast';
-  animationEnabled?: boolean;
-}
+import { palette } from '../../styles/palette';
+import type { SpeciesSvgProps } from './PlanktonSvg';
 
-export function CrabSvg({ size = 32, colorTheme = 'default', animationEnabled = true }: SpeciesSvgProps) {
+export function CrabSvg({ size = 24, animated = true, animState = 'normal' }: SpeciesSvgProps) {
+  let animClass = 'crab-idle';
+  if (animState === 'born') animClass = 'species-born';
+  if (animState === 'dying') animClass = 'species-dying';
+  if (animState === 'moving') animClass = 'species-moving';
+  const pausedClass = !animated && animState === 'normal' ? ' anim-paused' : '';
+  
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Body — rounded rectangle top-down */}
-      <ellipse cx="16" cy="16" rx="8" ry="6" fill="#e07b39" />
-      {/* Shell pattern */}
-      <ellipse cx="16" cy="15" rx="5" ry="4" fill="#c85f20" fillOpacity="0.5" />
-      {/* Left claw */}
-      <path d="M8,14 Q3,10 2,13 Q1,16 5,17 Q7,17 8,16" fill="#c85f20" stroke="#a04818" strokeWidth="0.5" />
-      {/* Right claw */}
-      <path d="M24,14 Q29,10 30,13 Q31,16 27,17 Q25,17 24,16" fill="#c85f20" stroke="#a04818" strokeWidth="0.5" />
-      {/* Legs left */}
-      <line x1="10" y1="14" x2="6" y2="11" stroke="#a04818" strokeWidth="1.2" />
-      <line x1="10" y1="16" x2="5" y2="16" stroke="#a04818" strokeWidth="1.2" />
-      <line x1="10" y1="18" x2="6" y2="21" stroke="#a04818" strokeWidth="1.2" />
-      {/* Legs right */}
-      <line x1="22" y1="14" x2="26" y2="11" stroke="#a04818" strokeWidth="1.2" />
-      <line x1="22" y1="16" x2="27" y2="16" stroke="#a04818" strokeWidth="1.2" />
-      <line x1="22" y1="18" x2="26" y2="21" stroke="#a04818" strokeWidth="1.2" />
-      {/* Eyes */}
-      <circle cx="13" cy="12" r="1.5" fill="black" />
-      <circle cx="19" cy="12" r="1.5" fill="black" />
-      <circle cx="13.5" cy="11.5" r="0.5" fill="white" />
-      <circle cx="19.5" cy="11.5" r="0.5" fill="white" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g className={animClass + pausedClass}>
+        {/* Body — wide oval */}
+        <ellipse cx="12" cy="13" rx="8" ry="5" fill={palette.crab} />
+        {/* Left claw bump - KEY identifier */}
+        <circle cx="3" cy="12" r="3" fill={palette.crabDark} />
+        {/* Right claw bump - KEY identifier */}
+        <circle cx="21" cy="12" r="3" fill={palette.crabDark} />
+        {/* Eyes on top */}
+        <circle cx="10" cy="8" r="1.5" fill="#1a2a3a" />
+        <circle cx="14" cy="8" r="1.5" fill="#1a2a3a" />
+      </g>
     </svg>
   );
 }

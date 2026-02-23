@@ -1,29 +1,24 @@
-interface SpeciesSvgProps {
-  size?: number;
-  colorTheme?: 'default' | 'high-contrast';
-  animationEnabled?: boolean;
-}
+import { palette } from '../../styles/palette';
+import type { SpeciesSvgProps } from './PlanktonSvg';
 
-export function SardineSvg({ size = 32, colorTheme = 'default', animationEnabled = true }: SpeciesSvgProps) {
+export function SardineSvg({ size = 24, animated = true, animState = 'normal' }: SpeciesSvgProps) {
+  let animClass = 'sardine-idle';
+  if (animState === 'born') animClass = 'species-born';
+  if (animState === 'dying') animClass = 'species-dying';
+  if (animState === 'moving') animClass = 'species-moving';
+  const pausedClass = !animated && animState === 'normal' ? ' anim-paused' : '';
+  
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {animationEnabled && (
-        <style>{`
-          @keyframes sardineFin { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
-          .sardine-fin { transform-origin: center; animation: sardineFin 1.5s ease-in-out infinite; }
-        `}</style>
-      )}
-      {/* Body — elongated ellipse */}
-      <ellipse cx="15" cy="16" rx="11" ry="6" fill="#89b4d8" />
-      {/* Tail */}
-      <polygon points="26,16 30,12 30,20" fill="#5a8aaa" />
-      {/* Belly highlight */}
-      <ellipse cx="14" cy="17" rx="7" ry="3" fill="#b8d4e8" fillOpacity="0.5" />
-      {/* Dorsal fin */}
-      <path className={animationEnabled ? "sardine-fin" : ""} d="M10,10 Q14,6 18,10" stroke="#5a8aaa" strokeWidth="1.5" fill="none" />
-      {/* Eye */}
-      <circle cx="6" cy="15" r="2" fill="white" />
-      <circle cx="6.5" cy="15" r="1" fill="#1a2a3a" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g className={animClass + pausedClass}>
+        {/* Forked tail */}
+        <polygon points="21,12 24,8 24,16" fill={palette.sardineDark} />
+        {/* Body — bold teardrop */}
+        <ellipse cx="11" cy="12" rx="9" ry="4" fill={palette.sardine} />
+        {/* Eye - bright white with dark pupil */}
+        <circle cx="4" cy="11" r="1.5" fill="white" />
+        <circle cx="4.3" cy="11" r="0.7" fill="#1a2a3a" />
+      </g>
     </svg>
   );
 }
