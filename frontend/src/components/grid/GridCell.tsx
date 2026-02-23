@@ -1,13 +1,13 @@
 import React from 'react';
-import type { SpecimenType } from '../../types/simulation.types';
+import type { Cell } from '../../types/simulation.types';
 import { PlanktonSvg, SardineSvg, SharkSvg, CrabSvg, ReefSvg, DeadSardineSvg, DeadSharkSvg } from '../species';
 
 interface GridCellProps {
-  specimenType: SpecimenType;
+  cell: Cell;
   size: number;
 }
 
-const SvgMap: Partial<Record<SpecimenType, React.ComponentType<{ size: number }>>> = {
+const SvgMap: Partial<Record<string, React.ComponentType<{ size: number }>>> = {
   Plankton: PlanktonSvg,
   Sardine: SardineSvg,
   Shark: SharkSvg,
@@ -17,10 +17,13 @@ const SvgMap: Partial<Record<SpecimenType, React.ComponentType<{ size: number }>
   DeadShark: DeadSharkSvg,
 };
 
-export const GridCell = React.memo(({ specimenType, size }: GridCellProps) => {
-  const SvgComponent = SvgMap[specimenType];
+export const GridCell = React.memo(({ cell, size }: GridCellProps) => {
+  const SvgComponent = SvgMap[cell.specimenType];
   return (
-    <div style={{ width: size, height: size, background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div 
+      data-testid={`cell-${cell.position.row}-${cell.position.col}`}
+      style={{ width: size, height: size, background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
       {SvgComponent && <SvgComponent size={Math.max(16, size - 4)} />}
     </div>
   );

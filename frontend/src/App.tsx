@@ -22,7 +22,7 @@ function App() {
         <ConfigPanel onStart={handleStart} />
       ) : (
         <div className="simulation-layout grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-          <div className="left-panel space-y-4">
+          <div className="left-panel space-y-4" data-testid="left-panel">
             <div className="grid-container bg-gray-800 rounded-lg p-4 flex justify-center">
               {sim.state.grid && <OceanGrid grid={sim.state.grid} />}
             </div>
@@ -39,7 +39,7 @@ function App() {
               />
             </div>
           </div>
-          <div className="right-panel bg-gray-800 rounded-lg">
+          <div className="right-panel bg-gray-800 rounded-lg" data-testid="right-panel">
             <StatsPanel state={sim.state} />
           </div>
         </div>
