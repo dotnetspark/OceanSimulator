@@ -13,3 +13,4 @@ C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Application\ob
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Application\obj\Debug\net8.0\refint\OceanSimulator.Application.dll
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Application\obj\Debug\net8.0\OceanSimulator.Application.pdb
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Application\obj\Debug\net8.0\ref\OceanSimulator.Application.dll
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Application\obj\Debug\net8.0\OceanSimulator.Application.sourcelink.json

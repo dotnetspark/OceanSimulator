@@ -48,3 +48,4 @@ C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Api\obj\Debug\
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Api\obj\Debug\net8.0\OceanSimulator.Api.pdb
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Api\obj\Debug\net8.0\OceanSimulator.Api.genruntimeconfig.cache
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Api\obj\Debug\net8.0\ref\OceanSimulator.Api.dll
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Api\obj\Debug\net8.0\OceanSimulator.Api.sourcelink.json

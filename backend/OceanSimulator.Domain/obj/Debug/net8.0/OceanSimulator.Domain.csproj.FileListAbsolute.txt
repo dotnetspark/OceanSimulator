@@ -9,3 +9,4 @@ C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Deb
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\refint\OceanSimulator.Domain.dll
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.pdb
 C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\ref\OceanSimulator.Domain.dll
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.sourcelink.json
