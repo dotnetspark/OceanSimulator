@@ -63,3 +63,18 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 
 **PR:** https://github.com/dotnetspark/OceanSimulator/pull/23
 
+### 2026-02-23: Replaced ISpecimen?[,] grid with Dictionary<Position, ISpecimen>
+
+**What changed:**
+- `Ocean._grid` is now `Dictionary<Position, ISpecimen>` instead of `ISpecimen?[rows, cols]`
+- `GetSpecimenAt` uses `TryGetValue`; absent key = Water (null)
+- `SetSpecimenAt` calls `_grid.Remove` on null, `_grid[pos] = specimen` otherwise
+- Constructor no longer allocates the 2D array; field initializer handles it
+- `_specimens` list unchanged — still used for O(n) iteration over living specimens
+
+**Key insight:**
+- `Position` is a C# `record` → auto-generates correct `Equals` + `GetHashCode` based on (Row, Col) values. No manual override needed.
+- Water is implicit: a cell not in the dictionary is Water. Zero memory overhead for empty cells.
+- All public methods (`GetCellType`, `GetEmptyCells`, `GetAdjacentCellsOfType`, etc.) delegate to `GetSpecimenAt` — no changes needed there.
+- Build: 0 errors, 0 warnings.
+

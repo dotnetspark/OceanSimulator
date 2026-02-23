@@ -226,6 +226,234 @@ Helper for creating test oceans:
 4. E2E Playwright tests added once API is live
 
 
+# Decision: Sparse Dictionary for Ocean Grid Storage
+
+**Date:** 2026-02-23  
+**Author:** Dallas (Backend Dev)  
+**Context:** Ocean.cs grid refactor — replacing 2D array with Dictionary
+
+## Decision: Use Dictionary<Position, ISpecimen> for O(1) Position Lookup
+
+**Before:**
+```csharp
+private readonly ISpecimen?[,] _grid;
+// Constructor: _grid = new ISpecimen?[rows, cols];
+// Read:  return _grid[position.Row, position.Col];
+// Write: _grid[position.Row, position.Col] = specimen;
+```
+
+**After:**
+```csharp
+private readonly Dictionary<Position, ISpecimen> _grid = new();
+// Read:  return _grid.TryGetValue(position, out var s) ? s : null;
+// Write: if null → _grid.Remove(position); else → _grid[position] = specimen;
+```
+
+## Rationale
+
+- **Sparse grid:** Most cells are Water. Storing every cell in a 2D array wastes memory proportional to `rows × cols`. The dictionary only allocates entries for non-water specimens.
+- **O(1) lookup preserved:** Dictionary.TryGetValue is O(1) average — same asymptotic cost as array indexing.
+- **Water is implicit:** Absence of a key means Water. `GetCellType` returns `SpecimenType.Water` when `GetSpecimenAt` returns null — unchanged behavior.
+- **Position is a record:** C# `record` types auto-generate value-based `Equals` and `GetHashCode`, making `Position` a correct dictionary key without any manual override.
+
+## What Stays the Same
+
+- `_specimens` List — used for fast O(n) iteration over all living specimens (ordered for snapshot processing).
+- All public query methods (`GetCellType`, `GetEmptyCells`, `GetAdjacentCellsOfType`) delegate to `GetSpecimenAt` — no changes needed.
+- Controller's `BuildGrid` calls `ocean.GetSpecimenAt(pos)` per cell — still returns null for Water.
+
+## Benefit
+
+- Memory scales with specimen count, not grid size. A 100×100 grid with 50 specimens uses ~50 dictionary entries instead of 10,000 array slots.
+- No behavior change visible to callers.
+
+
+# Visual Overhaul — SVG Components & Stats Panel
+
+**Date:** 2026-02-23  
+**Author:** Lambert (Visual Designer)
+
+## Decisions
+
+### 1. Unified SpeciesSvgProps Interface
+
+All SVG species components now accept a standardized interface:
+
+```typescript
+interface SpeciesSvgProps {
+  size?: number;           // default 24, optimized for 20-24px grid cells
+  animated?: boolean;      // default true, controls idle animations
+  animState?: 'normal' | 'born' | 'dying' | 'moving';
+}
+```
+
+**Rationale:**
+- `animated` prop allows users/accessibility settings to disable CPU-intensive animations
+- `animState` enables CSS-driven transition animations without JavaScript timers
+- `size` default of 24 aligns with typical grid cell sizes
+
+### 2. CSS Animations via `<style>` Tags in SVG
+
+All animations are defined within `<style>` tags inside each SVG, using CSS `@keyframes`:
+
+- **Idle animations:** Continuously loop when `animated=true`, paused via `animation-play-state: paused` when disabled
+- **born:** `scale(0→1)` over 400ms ease-out
+- **dying:** `opacity(1→0)` over 600ms ease-in with `forwards` fill
+- **moving:** Brief brightness flash over 200ms
+
+**Rationale:**
+- Pure CSS animations are GPU-accelerated and don't block the main thread
+- No JavaScript animation libraries needed
+- `animState` changes trigger CSS class swaps, which is cleaner than imperative animation
+
+### 3. Species Visual Language
+
+Each species has distinct visual characteristics for instant recognition at small sizes:
+
+| Species | Shape | Color | Idle Animation |
+|---------|-------|-------|----------------|
+| Plankton | Multiple clustered circles | Green #7ec8a0 | Gentle pulse |
+| Sardine | Slim oval + forked tail | Silver-blue #89b4d8 | Side-to-side wave |
+| Shark | Angular torpedo + prominent dorsal | Slate #546e7a | Forward glide |
+| Crab | Wide body + distinct claws | Orange #e07b39 | Claw pinch |
+| Reef | Jagged coral spires | Brown #8b7355 | None (static) |
+| Dead* | Same shape, desaturated | Grey #4a5a6a | None + X eyes |
+
+### 4. Population Display as Pie Chart
+
+Replaced the emoji-based population cards with a `<PopulationPieChart>` component:
+
+- **Donut chart:** Inner radius shows total count in center
+- **Species SVGs as legend icons:** Uses actual `<XxxSvg size={16} animated={false} />` components
+- **Color consistency:** Slice colors match `palette.ts` species colors exactly
+
+**Rationale:**
+- Pie chart provides proportional visualization (10 plankton vs 100 plankton is immediately apparent)
+- Using actual SVG components as legend reinforces visual consistency
+- Eliminates emoji rendering inconsistencies across platforms
+
+### 5. XAxis Label on Population Graph
+
+Added explicit `label={{ value: 'Snapshot', position: 'insideBottom', offset: -5 }}` to `<XAxis>` in PopulationGraph.
+
+**Rationale:**
+- Makes it immediately clear what the X axis represents
+- Aligns with standard graph labeling conventions
+
+## Files Changed
+
+- `frontend/src/components/species/*.tsx` — All 7 SVG components redesigned
+- `frontend/src/components/species/index.ts` — Added SpeciesSvgProps export
+- `frontend/src/components/stats/PopulationPieChart.tsx` — NEW component
+- `frontend/src/components/stats/StatsPanel.tsx` — Replaced cards with pie chart
+- `frontend/src/components/stats/PopulationGraph.tsx` — Added XAxis label
+- `frontend/src/components/stats/index.ts` — Export PopulationPieChart
+
+## Migration Notes
+
+Components using the old prop interface (`colorTheme`, `animationEnabled`) will need updating:
+- `colorTheme` removed (high-contrast can be added later)
+- `animationEnabled` → `animated`
+- New `animState` prop for transition animations
+
+
+# Decision: Removed Tailwind Classes in Favor of Inline Styles with Palette
+
+**Date:** 2026-02-23  
+**Decider:** Parker (Frontend Dev)  
+**Status:** Implemented
+
+## Context
+
+User feedback indicated "UI is not user friendly." The app had well-defined palette colors but was using Tailwind classes that didn't reference them, leading to inconsistent colors (e.g., `bg-gray-900`, `bg-gray-800` instead of palette.background, palette.panelBg).
+
+## Decision
+
+Replace all Tailwind utility classes with inline styles that directly reference the palette colors. Keep Tailwind's @directives in CSS but use it only for reset/base styles.
+
+## Rationale
+
+1. **Color consistency**: Inline styles allow direct use of palette colors (e.g., `background: '#0a1628'`) ensuring the ocean theme is consistent throughout
+2. **Better UX control**: Inline styles give precise control over spacing, sizing, and layout without Tailwind's abstraction layer
+3. **Emojis & icons**: Ocean-themed emojis (🌊, 🌿, 🐟, 🦈, 🦀, 🪸) make the UI more intuitive and visually engaging
+4. **Layout improvements**: Changed from centered body + 50/50 split to full-width + 3fr/2fr grid for better simulation visibility
+5. **Visual hierarchy**: Better grouping (e.g., "Step", "Auto-run", "State" sections) and status feedback (pulsing running indicator)
+
+## Impact
+
+- **Positive**: UI is now visually cohesive, user-friendly, and properly uses the ocean theme palette
+- **Positive**: Config panel sliders make parameter adjustment intuitive
+- **Positive**: Header with reset button and snapshot counter improves navigation
+- **Testing**: All `data-testid` attributes preserved; no test changes needed
+- **Future**: If more components are added, they should follow the inline-style + palette pattern established here
+
+
+# Decision: Major UX Overhaul — Layout, Navigation, Controls
+
+**Date:** 2026-02-24  
+**Author:** Parker (Frontend Dev)  
+**Status:** Implemented
+
+## Changes Made
+
+### 1. Layout — 65/35 Split
+Changed `gridTemplateColumns` from `3fr 2fr` to `65fr 35fr`. Ocean panel now occupies ~65% of horizontal space; stats panel ~35% and scrollable. Left panel is a pure grid viewport — no controls below it.
+
+### 2. Hamburger Menu in Header
+Replaced the "⟵ New Simulation" header button and the Save/Load buttons in SimulationControls with a ☰ hamburger menu in the header top-right.
+
+**Menu items:**
+- 🌊 New Simulation — resets state, returns to config
+- 💾 Save State — triggers blob download
+- 📂 Load State — opens hidden file input
+- ─── divider ───
+- ℹ️ About — shows version info
+
+**Implementation:** `useState` for open/closed, `useRef` on the container, `mousedown` listener on document for click-outside dismissal. No external library. Hidden `<input type="file">` co-located with the menu ref.
+
+### 3. SimulationControls Props Removed
+- Removed: `snapshotNumber`, `onSave`, `onLoad`
+- Removed: "State" section (Save/Load buttons)
+- Save/Load now live exclusively in the hamburger menu
+
+### 4. Controls Moved to Bottom of Stats Panel
+`<SimulationControls>` is now rendered inside `<StatsPanel>` via an optional `controls?: ReactNode` prop. In App.tsx, the controls node is passed as a prop — no prop drilling, StatsPanel remains generic.
+
+### 5. Improved Button Labels
+- "▶ Run 1 Snapshot" → "▶ Run 1"
+- "⚡ Until Event" → "⚡ Until Birth or Death"
+- "💀 Extinction" → "💀 Run Until Extinct"
+- Extinction dropdown updated: "All Species" → "Any Species" (value stays `'all'`)
+
+### 6. Cell Animation State (`useGridDiff`)
+New hook `frontend/src/hooks/useGridDiff.ts`:
+```typescript
+export type CellChangeType = 'born' | 'died' | 'moved' | 'unchanged';
+export function useGridDiff(currentGrid: OceanGrid | null): Map<string, CellChangeType>
+```
+
+- Compares previous vs current grid **by reference** — only recomputes on actual grid updates
+- Returns `Map<string, CellChangeType>` keyed by `"${row}-${col}"`
+- Also exports `computeGridDiff` for direct use in tests
+
+`OceanGrid` accepts `changedCells?: Map<string, CellChangeType>` and passes `animState` to each `GridCell`.
+
+`GridCell` applies `data-anim={animState}` — Lambert can target `[data-anim="born"]`, `[data-anim="died"]`, etc. in CSS animations.
+
+## Files Modified
+- `frontend/src/App.tsx` — layout, hamburger menu, wiring
+- `frontend/src/components/controls/SimulationControls.tsx` — leaner props, better labels
+- `frontend/src/components/grid/OceanGrid.tsx` — changedCells prop
+- `frontend/src/components/grid/GridCell.tsx` — animState prop + data-anim attribute
+- `frontend/src/components/stats/StatsPanel.tsx` — controls?: ReactNode prop
+- `frontend/src/hooks/useGridDiff.ts` — NEW
+
+## TypeScript Notes
+- All type imports use `import type { X }` (verbatimModuleSyntax compliant)
+- No `any` used
+- `void` operator used on floating promise calls in event handlers
+
+
 # Backend Architecture Patterns and Decisions
 
 **Date:** 2026-02-23  

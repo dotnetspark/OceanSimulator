@@ -19,7 +19,7 @@ SVG species components (JSX, NOT string blobs):
 - `<ReefSvg />` — stylized coral/rock, not overly detailed
 - `<DeadSardineSvg />` / `<DeadSharkSvg />` — faded palette, X-eyes
 
-All SVG components accept props: `size`, `colorTheme`, `animationEnabled`.
+All SVG components accept props: `size`, `animated`, `animState`.
 
 Recharts graph components:
 - Population over time (all species on one chart)
@@ -39,3 +39,9 @@ Color palette must be consistent across SVGs and graphs. All species share a vis
 - **2026-02-23**: Color palette consistency is critical across SVGs and Recharts. Using a centralized `palette.ts` ensures species colors match in both grid cells and population graphs, creating visual coherence.
 
 - **2026-02-23**: Dead variants use desaturated colors + X-eyes visual metaphor. This clearly communicates state without animation, saving render cycles.
+
+- **2026-02-23**: ViewBox optimization for small sizes is essential. Changed from 32x32 to 24x24 viewBox to make SVGs crisper at typical 20-24px grid cell sizes. Shapes need to be simplified for readability at small scale — fewer details, bolder strokes.
+
+- **2026-02-23**: CSS animation states (`animState` prop) with values 'born', 'dying', 'moving' enable transition effects without JavaScript timers. Using `animation: X Yms forwards` with CSS class swaps is cleaner than imperative animation control.
+
+- **2026-02-23**: Pie charts with species SVG icons as legend items create stronger visual consistency than emoji. The `<Icon size={16} animated={false} />` pattern ensures icons display consistently across all platforms and reinforce species identity.
