@@ -66,3 +66,15 @@ export type OceanEvent =
   | { type: 'SpecimenBorn'; specimenId: string; specimenType: SpecimenType; position: Position }
   | { type: 'SpecimenDied'; specimenId: string; specimenType: SpecimenType; position: Position; cause: string }
   | { type: 'SnapshotCompleted'; snapshotResult: SnapshotResult };
+
+export interface EnergyData {
+  snapshot: number;
+  planktonAvg: number;
+  sardineAvg: number;
+  sharkAvg: number;
+  crabAvg: number;
+}
+
+export type RunMode = 'single' | 'n' | 'extinction' | 'event';
+
+export type ExtinctionTarget = 'plankton' | 'sardine' | 'shark' | 'crab' | 'all';
