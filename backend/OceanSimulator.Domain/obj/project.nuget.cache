@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "5aH1w77RdRU=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ylrre\\source\\repos\\OceanSimulator\\backend\\OceanSimulator.Domain\\OceanSimulator.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ylrre\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.22\\microsoft.netcore.app.ref.8.0.22.nupkg.sha512",
+    "C:\\Users\\ylrre\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.22\\microsoft.windowsdesktop.app.ref.8.0.22.nupkg.sha512",
+    "C:\\Users\\ylrre\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.22\\microsoft.aspnetcore.app.ref.8.0.22.nupkg.sha512"
+  ],
+  "logs": []
+}

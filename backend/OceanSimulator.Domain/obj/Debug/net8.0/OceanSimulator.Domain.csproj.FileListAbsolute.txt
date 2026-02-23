@@ -1,0 +1,11 @@
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\bin\Debug\net8.0\OceanSimulator.Domain.deps.json
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\bin\Debug\net8.0\OceanSimulator.Domain.dll
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\bin\Debug\net8.0\OceanSimulator.Domain.pdb
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.AssemblyInfoInputs.cache
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.AssemblyInfo.cs
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.csproj.CoreCompileInputs.cache
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.dll
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\refint\OceanSimulator.Domain.dll
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\OceanSimulator.Domain.pdb
+C:\Users\ylrre\source\repos\OceanSimulator\backend\OceanSimulator.Domain\obj\Debug\net8.0\ref\OceanSimulator.Domain.dll

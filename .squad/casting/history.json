@@ -1,0 +1,23 @@
+{
+  "universe_usage_history": [
+    {
+      "universe": "Alien",
+      "used_at": "2026-02-23T05:49:07.623Z",
+      "assignment_id": "ocean-simulator-001"
+    }
+  ],
+  "assignment_cast_snapshots": {
+    "ocean-simulator-001": {
+      "project": "OceanSimulator",
+      "universe": "Alien",
+      "cast": {
+        "ripley": "Lead",
+        "dallas": "Backend Dev",
+        "parker": "Frontend Dev",
+        "lambert": "Visual Designer",
+        "ash": "Tester"
+      },
+      "created_at": "2026-02-23T05:49:07.623Z"
+    }
+  }
+}

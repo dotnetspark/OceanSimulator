@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "OceanSimulator.Infrastructure/1.0.0": {
+        "dependencies": {
+          "OceanSimulator.Application": "1.0.0",
+          "OceanSimulator.Domain": "1.0.0"
+        },
+        "runtime": {
+          "OceanSimulator.Infrastructure.dll": {}
+        }
+      },
+      "OceanSimulator.Application/1.0.0": {
+        "dependencies": {
+          "OceanSimulator.Domain": "1.0.0"
+        },
+        "runtime": {
+          "OceanSimulator.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "OceanSimulator.Domain/1.0.0": {
+        "runtime": {
+          "OceanSimulator.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "OceanSimulator.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "OceanSimulator.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "OceanSimulator.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
