@@ -35,4 +35,21 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
   - Domain interfaces: backend\OceanSimulator.Domain\Interfaces\
   - Frontend types: frontend\src\types\simulation.types.ts
 
+### 2026-02-23: PR review, SOLID audit, and documentation complete
+- Reviewed PRs #21 (visual), #22 (frontend), #23 (backend), #24 (tests) — all approved
+- All four PRs merged to main in order: visual → frontend → backend → tests
+- Domain layer has ZERO external dependencies — Clean Architecture boundary verified
+- Behavior is embedded in entities via polymorphic ExecuteMove, not via separate Strategy classes — conscious tradeoff documented in decisions.md
+- IRandomProvider properly injected everywhere; no direct System.Random in Domain
+- SnapshotOrchestrator implements Template Method correctly
+- Dead specimens (DeadSardine, DeadShark) are real entities — not null/flag patterns
+- SpecimenFactory creates all types from config
+- **Tech debt identified:** SnapshotOrchestrator.CreateOffspring duplicates SpecimenFactory switch logic — should inject ISpecimenFactory
+- **Tech debt identified:** colorTheme prop on SVG components declared but unused
+- Frontend: zero `any` types, proper component/hook separation, typed API layer
+- Tests: MockRandomProvider is queue-based deterministic; 65+ backend tests spec-driven; some weak assertions in orchestrator tests
+- Created docs/ARCHITECTURE.md (SOLID audit, pattern inventory, species matrix, entity hierarchy)
+- Created README.md (getting started, testing, species reference)
+- Closed issues #1-17, #19, #20
+
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
