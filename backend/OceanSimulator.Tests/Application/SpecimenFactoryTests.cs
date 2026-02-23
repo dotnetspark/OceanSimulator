@@ -17,14 +17,12 @@ public class SpecimenFactoryTests
     public void Factory_Creates_CorrectType(SpecimenType type)
     {
         // Arrange
-        var config = new SimulationConfig
-        {
-            PlanktonBreedingThreshold = 3,
-            SardineBreedingThreshold = 5,
-            SharkBreedingThreshold = 7,
-            SardineEnergyThreshold = 10,
-            SharkEnergyThreshold = 15
-        };
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         var position = new Position(1, 1);
         
@@ -40,11 +38,12 @@ public class SpecimenFactoryTests
     public void Factory_Sardine_HasCorrectDefaultEnergy()
     {
         // Arrange
-        var config = new SimulationConfig
-        {
-            SardineEnergyThreshold = 12,
-            SardineBreedingThreshold = 5
-        };
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 12, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act
@@ -60,11 +59,12 @@ public class SpecimenFactoryTests
     public void Factory_Shark_HasCorrectDefaultEnergy()
     {
         // Arrange
-        var config = new SimulationConfig
-        {
-            SharkEnergyThreshold = 20,
-            SharkBreedingThreshold = 8
-        };
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 8,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 20, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act
@@ -80,10 +80,12 @@ public class SpecimenFactoryTests
     public void Factory_Plankton_HasCorrectBreedingThreshold()
     {
         // Arrange
-        var config = new SimulationConfig
-        {
-            PlanktonBreedingThreshold = 4
-        };
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 4, SardineBreedingThreshold: 5, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act
@@ -98,7 +100,12 @@ public class SpecimenFactoryTests
     public void Factory_Crab_DoesNotRequireThresholds()
     {
         // Arrange
-        var config = new SimulationConfig();
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act
@@ -113,7 +120,12 @@ public class SpecimenFactoryTests
     public void Factory_Throws_ForWaterType()
     {
         // Arrange
-        var config = new SimulationConfig();
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act & Assert
@@ -124,7 +136,12 @@ public class SpecimenFactoryTests
     public void Factory_DeadSardine_CreatesCorrectType()
     {
         // Arrange
-        var config = new SimulationConfig();
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act
@@ -140,7 +157,12 @@ public class SpecimenFactoryTests
     public void Factory_DeadShark_CreatesCorrectType()
     {
         // Arrange
-        var config = new SimulationConfig();
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act
@@ -156,11 +178,12 @@ public class SpecimenFactoryTests
     public void Factory_Sardine_BreedingThreshold_IsSetFromConfig()
     {
         // Arrange
-        var config = new SimulationConfig
-        {
-            SardineBreedingThreshold = 7,
-            SardineEnergyThreshold = 10
-        };
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 7, SharkBreedingThreshold: 7,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act
@@ -175,11 +198,12 @@ public class SpecimenFactoryTests
     public void Factory_Shark_BreedingThreshold_IsSetFromConfig()
     {
         // Arrange
-        var config = new SimulationConfig
-        {
-            SharkBreedingThreshold = 9,
-            SharkEnergyThreshold = 15
-        };
+        var config = new SimulationConfig(
+            Rows: 10, Cols: 10,
+            InitialPlankton: 5, InitialSardines: 3, InitialSharks: 2, InitialCrabs: 1, InitialReefs: 5,
+            PlanktonBreedingThreshold: 3, SardineBreedingThreshold: 5, SharkBreedingThreshold: 9,
+            SardineEnergyThreshold: 10, SharkEnergyThreshold: 15, Seed: null
+        );
         var factory = new SpecimenFactory(config);
         
         // Act

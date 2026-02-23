@@ -39,4 +39,15 @@ End-to-End (Playwright):
 
 ## Learnings
 
-<!-- Append new learnings below. Each entry is something lasting about the project. -->
+### 2026-02-23: Initial comprehensive test suite (PR #24)
+- Created 65+ tests covering all species behavior from spec
+- MockRandomProvider: Deterministic testing of all random behavior with queue-based int/double provision
+- OceanTestBuilder: Simplified test ocean creation
+- Backend tests: PlanktonBehaviorTests (6 tests), SardineBehaviorTests (9 tests), SharkBehaviorTests (9 tests), CrabBehaviorTests (7 tests)
+- Application layer: SnapshotOrchestratorTests (9 tests), SpecimenFactoryTests (11 tests)
+- Integration: SerializationTests (7 tests placeholder), MultiSnapshotTests (6 tests)
+- Frontend: Vitest + React Testing Library setup, GridCell/SimulationControls/ConfigPanel mock tests
+- 58 tests passing, 7 failures expected due to incomplete implementation by Dallas
+- SimulationConfig is a record type requiring positional parameters, not object initializer
+- Tests compile cleanly and define expected behavior for ongoing implementation
+
