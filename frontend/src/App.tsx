@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useSimulation } from './hooks/useSimulation';
 import { useGridDiff } from './hooks/useGridDiff';
 import { ConfigPanel } from './components/controls/ConfigPanel';
-import { SimulationControls } from './components/controls/SimulationControls';
+
 import { OceanGrid } from './components/grid/OceanGrid';
 import { StatsPanel } from './components/stats/StatsPanel';
 import type { SimulationConfig } from './types/simulation.types';
@@ -59,26 +59,18 @@ function App() {
     loadFileRef.current?.click();
   };
 
-  const controls = (
-    <SimulationControls
-      isRunning={sim.state.isRunning}
-      onRunOne={sim.runSnapshot}
-      onRunN={sim.runNSnapshots}
-      onRunUntilExtinction={sim.runUntilExtinction}
-      onRunUntilEvent={sim.runUntilEvent}
-    />
-  );
+
 
   return (
     <div className="min-h-screen bg-[#0a1628] text-[#e8f4f8] font-[system-ui,sans-serif]">
       {/* Header */}
-      <header className="flex items-center justify-between h-14 px-6 border-b border-[rgba(0,180,216,0.2)] bg-[#0f1f3d] relative z-10">
-        <span className="text-xl font-bold text-[#00b4d8] tracking-[-0.5px]">
+      <header className="flex items-center justify-between h-16 px-6 border-b border-[rgba(0,180,216,0.2)] bg-[#0f1f3d] relative z-10">
+        <span className="text-2xl font-bold text-[#00b4d8] tracking-[-0.5px]">
           🌊 Ocean Simulator
         </span>
         <div className="flex items-center gap-4">
           {started && (
-            <span className="text-[13px] text-[#7a9bb5]">
+            <span className="text-sm text-[#7a9bb5]">
               Snapshot <span className="text-[#00b4d8] font-semibold">#{sim.state.snapshotNumber}</span>
             </span>
           )}
@@ -87,7 +79,7 @@ function App() {
               <button
                 onClick={() => setMenuOpen(o => !o)}
                 aria-label="Open menu"
-                className="bg-transparent border border-[rgba(0,180,216,0.2)] rounded-md text-[#e8f4f8] cursor-pointer px-3 py-[5px] text-lg leading-none"
+                className="bg-transparent border border-[rgba(0,180,216,0.2)] rounded-md text-[#e8f4f8] cursor-pointer px-4 py-2.5 text-xl leading-none min-w-[40px] min-h-[40px]"
               >
                 ☰
               </button>
@@ -102,7 +94,7 @@ function App() {
                       key={item.label}
                       onClick={item.action}
                       data-testid={item.testId}
-                      className="flex items-center gap-2.5 w-full py-[11px] px-4 bg-transparent border-none text-[#e8f4f8] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.1)]"
+                      className="flex items-center gap-2.5 w-full py-3 px-4 bg-transparent border-none text-[#e8f4f8] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.1)]"
                     >
                       <span className="text-base">{item.icon}</span>
                       {item.label}
@@ -111,7 +103,7 @@ function App() {
                   <div className="h-px bg-[rgba(0,180,216,0.15)] my-1" />
                   <button
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2.5 w-full py-[11px] px-4 bg-transparent border-none text-[#7a9bb5] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.05)]"
+                    className="flex items-center gap-2.5 w-full py-3 px-4 bg-transparent border-none text-[#7a9bb5] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.05)]"
                   >
                     <span className="text-base">ℹ️</span>
                     About — v1.0.0
@@ -144,10 +136,10 @@ function App() {
       {!started ? (
         <ConfigPanel onStart={handleStart} />
       ) : (
-        <div className="grid h-[calc(100vh-56px)]" style={{ gridTemplateColumns: '65fr 35fr' }}>
-          {/* Left: ocean grid — full height, no controls below */}
-          <div className="flex flex-col overflow-hidden border-r border-[rgba(0,180,216,0.1)]" data-testid="left-panel">
-            <div className="flex-1 overflow-auto flex items-center justify-center p-4 bg-[#0a1628]">
+        <>
+          <div className="relative h-[calc(100vh-64px-72px)] w-full">
+            {/* Ocean grid — full size */}
+            <div className="w-full h-full overflow-auto flex items-center justify-center p-4 bg-[#0a1628]" data-testid="simulation-view">
               {sim.state.grid
                 ? <OceanGrid grid={sim.state.grid} changedCells={changedCells} />
                 : <div className="text-center text-[#7a9bb5]">
@@ -157,12 +149,21 @@ function App() {
                   </div>
               }
             </div>
+            {/* Stats panel — floating glass overlay */}
+            <StatsPanel state={sim.state} />
           </div>
-          {/* Right: stats + controls at bottom */}
-          <div className="overflow-auto bg-[#0f1f3d] flex flex-col" data-testid="right-panel">
-            <StatsPanel state={sim.state} controls={controls} />
-          </div>
-        </div>
+          {/* Fixed bottom footer with simulation controls */}
+          <footer className="fixed bottom-0 left-0 right-0 bg-[#0f1f3d] border-t border-[rgba(0,180,216,0.2)] z-20">
+            <SimulationControls
+              variant="footer"
+              isRunning={sim.state.isRunning}
+              onRunOne={sim.runSnapshot}
+              onRunN={sim.runNSnapshots}
+              onRunUntilExtinction={sim.runUntilExtinction}
+              onRunUntilEvent={sim.runUntilEvent}
+            />
+          </footer>
+        </>
       )}
     </div>
   );

@@ -1,8 +1,6 @@
 import React from 'react';
 import type { Cell } from '../../types/simulation.types';
 import type { CellChangeType } from '../../hooks/useGridDiff';
-import type { SpeciesSvgProps } from '../species';
-import { PlanktonSvg, SardineSvg, SharkSvg, CrabSvg, ReefSvg, DeadSardineSvg, DeadSharkSvg } from '../species';
 
 interface GridCellProps {
   cell: Cell;
@@ -10,27 +8,28 @@ interface GridCellProps {
   animState?: CellChangeType;
 }
 
-type SvgAnimState = SpeciesSvgProps['animState'];
-
-function toSvgAnim(c?: CellChangeType): SvgAnimState {
-  if (c === 'born')      return 'born';
-  if (c === 'died')      return 'dying';
-  if (c === 'moved')     return 'moving';
-  return 'normal';
-}
-
-const SvgMap: Partial<Record<string, React.ComponentType<SpeciesSvgProps>>> = {
-  Plankton:    PlanktonSvg,
-  Sardine:     SardineSvg,
-  Shark:       SharkSvg,
-  Crab:        CrabSvg,
-  Reef:        ReefSvg,
-  DeadSardine: DeadSardineSvg,
-  DeadShark:   DeadSharkSvg,
+const EmojiMap: Partial<Record<string, string>> = {
+  Plankton:    '🌿',
+  Sardine:     '🐟',
+  Shark:       '🦈',
+  Crab:        '🦀',
+  Reef:        '🪸',
+  DeadSardine: '🐟',
+  DeadShark:   '🦈',
 };
 
+const isDead = (t: string) => t === 'DeadSardine' || t === 'DeadShark';
+
 export const GridCell = React.memo(({ cell, size, animState }: GridCellProps) => {
-  const SvgComponent = SvgMap[cell.specimenType];
+  const emoji = EmojiMap[cell.specimenType];
+  const dead = isDead(cell.specimenType);
+  const fontSize = Math.max(10, Math.floor(size * 0.72));
+
+  let animClass = '';
+  if (animState === 'born') animClass = 'species-born';
+  else if (animState === 'died') animClass = 'species-dying';
+  else if (animState === 'moved') animClass = 'species-moving';
+
   return (
     <div
       data-testid={`cell-${cell.position.row}-${cell.position.col}`}
@@ -38,7 +37,20 @@ export const GridCell = React.memo(({ cell, size, animState }: GridCellProps) =>
       className="flex items-center justify-center bg-[#0d1b2a] border border-[rgba(255,255,255,0.04)]"
       style={{ width: size, height: size }}
     >
-      {SvgComponent && <SvgComponent size={Math.max(16, size - 4)} animState={toSvgAnim(animState)} />}
+      {emoji && (
+        <span
+          className={animClass || undefined}
+          style={{
+            fontSize,
+            lineHeight: 1,
+            opacity: dead ? 0.45 : 1,
+            filter: dead ? 'grayscale(80%)' : undefined,
+            display: 'block',
+          }}
+        >
+          {emoji}
+        </span>
+      )}
     </div>
   );
 });

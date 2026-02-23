@@ -75,3 +75,15 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 - **Animation import**: Added `@import './styles/animations.css'` to `index.css` before @tailwind directives, enabling Lambert's CSS animations for cell state changes via `data-anim` attributes
 - **Cross-agent**: Lambert completed SVG CSS refactor (centralized keyframes, removed 400+ duplicate style tags), redesigned species for readability, improved charts (split Prey/Predators, mirrored BirthDeathGraph)
 - **TypeScript compliance**: Zero errors with strict mode + verbatimModuleSyntax
+
+### 2026-02-24: UX Refinements — Header, Footer Controls, Layout
+- **Header improvements**: Increased height from `h-14` (56px) to `h-16` (64px); app title now `text-2xl font-bold`; snapshot counter `text-sm`; hamburger button enlarged to 40×40px hit area with better padding (`px-4 py-2.5 text-xl`)
+- **Menu item sizing**: Dropdown menu items now use `py-3` (12px vertical padding) instead of `py-[11px]` for comfortable touch targets
+- **Footer-based controls**: Moved `SimulationControls` from StatsPanel to a fixed bottom footer (`fixed bottom-0 left-0 right-0 z-20`); only visible when simulation started
+- **SimulationControls variants**: Added `variant?: 'sidebar' | 'footer'` prop; footer variant uses horizontal flexbox (`flex flex-row gap-4 items-center flex-wrap`) for single-row layout; sidebar variant retains vertical layout with grouped sections
+- **Layout adjustment**: Main content height now `h-[calc(100vh-64px-72px)]` to account for both header (64px) and footer (72px) without overlap
+- **StatsPanel independence**: Removed `controls?: ReactNode` prop from StatsPanel since controls now live in footer; StatsPanel is now a pure floating glass overlay
+- **Key files**: `frontend/src/App.tsx`, `frontend/src/components/controls/SimulationControls.tsx`, `frontend/src/components/stats/StatsPanel.tsx`
+- **TypeScript compliance**: Zero errors with strict mode + verbatimModuleSyntax
+
+📌 Team update (2026-02-23T21-30-00Z): Lambert redesigned StatsPanel as floating glass overlay; Bishop replaced charts with ecosystem metrics (Ecosystem Balance, Population Pulse); Ripley added Mermaid architecture diagrams — coordinated footer layout with Lambert, confirmed charts fit within panel, charts use existing palette colors. — decided by Lambert, Bishop, Ripley

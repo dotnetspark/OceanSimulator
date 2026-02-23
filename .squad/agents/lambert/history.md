@@ -57,3 +57,9 @@ Color palette must be consistent across SVGs and graphs. All species share a vis
 - **SVG redesign**: Simplified each species to ≤5 bold, iconic elements for 20-30px readability; eliminated animation conflicts entirely
 - **Chart improvements**: PopulationGraph split into Prey/Predators mini-charts; BirthDeathGraph now mirrored flow chart with ReferenceLine
 - **Cross-agent**: Parker added `@import './styles/animations.css'` to `index.css` and migrated components to Tailwind; animation surface (`data-anim` attributes) now available for cell state targeting
+
+- **2026-02-23**: Glass panel flyover UX for stats panel — using `backdrop-filter: blur(12px)` with `rgba(10, 22, 40, 0.88)` background creates a frosted glass aesthetic without obscuring the ocean grid. Positioning as `absolute right-4 top-4` with `z-10` ensures proper layering. The vertical toggle tab (`writingMode: vertical-rl`) on the left edge is intuitive and saves horizontal space.
+
+- **2026-02-23**: Species count badges in a 2x2 grid at panel top provide instant population snapshot. Colors match species palette for visual consistency. Compact `rounded-lg` badges with emoji + count pattern is highly scannable.
+
+📌 Team update (2026-02-23T21-30-00Z): Parker moved SimulationControls to fixed footer with variant prop; Bishop replaced charts with ecosystem metrics (Ecosystem Balance, Population Pulse) with derived ratios and net change; Ripley added Mermaid diagrams — coordinated footer height constraints, charts fit within glass panel, updated testid references. — decided by Parker, Bishop, Ripley

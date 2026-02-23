@@ -49,10 +49,40 @@ export function PopulationPieChart({ plankton, sardine, shark, crab }: Populatio
     color,
   })).filter(item => item.value > 0);
 
+  const getEmoji = (label: string) => {
+    switch(label) {
+      case 'Plankton': return '🌿';
+      case 'Sardine': return '🐟';
+      case 'Shark': return '🦈';
+      case 'Crab': return '🦀';
+      default: return '';
+    }
+  };
+
+  if (total === 0) {
+    return (
+      <div data-testid="population-pie-chart">
+        <div style={{ fontSize: 12, fontWeight: 600, color: palette.textMuted, marginBottom: 12 }}>
+          🔵 CURRENT DISTRIBUTION
+        </div>
+        <div style={{ 
+          height: 140, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          color: palette.textMuted,
+          fontSize: 11,
+        }}>
+          Ocean is empty
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div data-testid="population-pie-chart">
-      <div style={{ fontSize: 11, fontWeight: 600, color: palette.textMuted, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
-        Population
+      <div style={{ fontSize: 12, fontWeight: 600, color: palette.textMuted, marginBottom: 12 }}>
+        🔵 CURRENT DISTRIBUTION
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <div style={{ position: 'relative', width: 140, height: 140 }}>
@@ -78,6 +108,11 @@ export function PopulationPieChart({ plankton, sardine, shark, crab }: Populatio
                   fontSize: 11,
                   borderRadius: 4,
                 }}
+                formatter={(value: number, name: string) => {
+                  const percentage = ((value as number / total) * 100).toFixed(0);
+                  return [`${getEmoji(name)} ${name}: ${value} (${percentage}%)`, ''];
+                }}
+                labelFormatter={() => ''}
               />
             </PieChart>
           </ResponsiveContainer>

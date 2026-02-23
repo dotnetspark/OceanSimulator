@@ -4,21 +4,55 @@ A full-stack marine ecosystem simulator. A 2D grid of ocean cells evolves throug
 
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| Backend | C# .NET 8, Clean Architecture, SignalR |
-| Frontend | React 18, TypeScript, Vite, Recharts |
-| Testing | xUnit, Vitest, Playwright |
+```mermaid
+graph TB
+    UI["React 18<br/>TypeScript<br/>Vite"]
+    API["SignalR Hub<br/>REST API"]
+    BL["Clean Architecture<br/>C# .NET 8"]
+    Test["xUnit, Vitest<br/>Playwright"]
+    
+    UI -->|WebSocket/HTTP| API
+    API -->|Orchestration| BL
+    Test -.->|Validates| BL
+    Test -.->|E2E Tests| UI
+    
+    style UI fill:#61dafb,color:#000
+    style API fill:#512bd4,color:#fff
+    style BL fill:#512bd4,color:#fff
+    style Test fill:#ffd43b,color:#000
+```
 
-## Species
+## Species & Food Chain
 
-| Species | Behavior |
-|---------|----------|
-| 🌿 Plankton | Moves to random Water cell, breeds |
-| 🐟 Sardine | Eats Plankton, else moves; starves without food |
-| 🦈 Shark | Eats Sardines; attacks rival Sharks when starving; starves |
-| 🦀 Crab | Scavenges dead specimens; immortal |
-| 🪨 Reef | Static obstacle |
+```mermaid
+graph LR
+    Plankton["🌿 Plankton<br/>Random movement<br/>Breeds always"]
+    Sardine["🐟 Sardine<br/>Eats Plankton<br/>Starves if hungry"]
+    Shark["🦈 Shark<br/>Eats Sardines<br/>Attacks rivals when hungry"]
+    Crab["🦀 Crab<br/>Scavenges dead<br/>Immortal"]
+    Reef["🪨 Reef<br/>Static obstacle"]
+    Dead["💀 Dead Bodies<br/>Crab food"]
+    
+    Plankton -->|Eaten by| Sardine
+    Sardine -->|Eaten by| Shark
+    Sardine -->|Dies| Dead
+    Shark -->|Dies| Dead
+    Dead -->|Consumed by| Crab
+    
+    style Plankton fill:#90EE90
+    style Sardine fill:#FFB6C1
+    style Shark fill:#FF6347
+    style Crab fill:#FFD700
+    style Reef fill:#A9A9A9
+    style Dead fill:#8B0000,color:#fff
+```
+
+**Species Behaviors:**
+- **Plankton:** Moves to random Water cell, breeds on every move
+- **Sardine:** Eats Plankton or moves to Water, starves without food
+- **Shark:** Eats Sardines, attacks rival Sharks when starving, breeds
+- **Crab:** Scavenges dead specimens; cannot starve or breed
+- **Reef:** Static obstacle; never moves
 
 ## Getting Started
 
@@ -83,7 +117,35 @@ npx playwright test
 
 ## Architecture
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full Clean Architecture diagram, design pattern inventory, and species behavior matrix.
+### Frontend Component Tree
+
+```mermaid
+graph TD
+    App["App<br/>(main entry)"]
+    SimView["SimulationView<br/>(state + hooks)"]
+    Controls["Controls<br/>(form & buttons)"]
+    Grid["OceanGrid<br/>(SVG rendering)"]
+    GridCell["GridCell×N²<br/>(cell + species)"]
+    StatsPanel["StatsPanel<br/>(population graphs)"]
+    Species["Species Components<br/>(Plankton, Sardine, etc)"]
+    
+    App --> SimView
+    SimView --> Controls
+    SimView --> Grid
+    SimView --> StatsPanel
+    Grid --> GridCell
+    GridCell --> Species
+    
+    style App fill:#61dafb,color:#000
+    style SimView fill:#61dafb,color:#000
+    style Controls fill:#87CEEB,color:#000
+    style Grid fill:#87CEEB,color:#000
+    style GridCell fill:#B0E0E6,color:#000
+    style StatsPanel fill:#87CEEB,color:#000
+    style Species fill:#E0FFFF,color:#000
+```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full Clean Architecture diagram, design pattern inventory, species behavior matrix, and snapshot execution flow.
 
 ## Extending
 

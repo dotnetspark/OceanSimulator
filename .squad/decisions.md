@@ -916,3 +916,201 @@ Now:
 - If responsive design needed, Tailwind breakpoints (`sm:`, `md:`, `lg:`) will be easier to apply now
 - ConfigPanel.tsx could be migrated in future iteration (not in scope for this task)
 
+
+# Chart Strategy: Meaningful Ecosystem Metrics
+
+**Date:** 2026-02-23  
+**Author:** Bishop (Data Analyst)  
+**Status:** Implemented
+
+## Decision: Replace raw count charts with derived metrics that answer specific questions
+
+### Rationale
+
+The original charts (population over time, births/deaths per snapshot) showed raw data but didn't provide actionable insights. Users couldn't tell at a glance whether the ecosystem was healthy, collapsing, or stable.
+
+### New Chart Suite
+
+Each chart is designed to answer exactly one critical question:
+
+#### 1. 🌊 Ecosystem Balance (replaces PopulationGraph)
+**Question:** "Is the predator-prey balance healthy or collapsing?"
+
+- **Metrics:**
+  - Predator Pressure = `sharks / (sardines + plankton + 0.001)` — ratio of predators to prey
+  - Prey Abundance = `(sardines + plankton) / totalPopulation` — fraction of ocean that is prey
+- **Chart type:** LineChart with 2 lines
+- **Colors:** Shark red (predator pressure), Plankton green (prey abundance)
+- **Y-axis:** Ratio scale (0–auto)
+- **Empty state:** "Run snapshots to see ecosystem balance emerge."
+
+High predator pressure with low prey abundance = ecosystem stress. Balanced lines = healthy dynamics.
+
+---
+
+#### 2. 📈 Population Pulse (replaces BirthDeathGraph)
+**Question:** "Is the total population growing, shrinking, or stable right now?"
+
+- **Metric:** Net change = `births - deaths` per snapshot
+- **Chart type:** BarChart with conditional coloring per bar
+- **Colors:** 
+  - Green if net > 0 (growth)
+  - Red if net < 0 (decline)
+  - Grey if net = 0 (stable)
+- **Reference line:** At y=0 to clearly show growth/decline boundary
+- **Tooltip:** "+N new" or "−N lost" format for clarity
+- **Empty state:** "Run snapshots to see population trends."
+
+Bars above zero = ecosystem growing. Bars below zero = ecosystem shrinking. Immediate visual feedback.
+
+---
+
+#### 3. 🔵 Current Distribution (improved PopulationPieChart)
+**Question:** "Who currently dominates the ocean?"
+
+- **Chart type:** Donut chart (kept existing)
+- **Improvements:**
+  - Tooltip format: "🌿 Plankton: 142 (45%)" — emoji + count + percentage
+  - Center label: Total population count
+  - Empty state: "Ocean is empty" when total = 0
+- **Colors:** Species palette (plankton green, sardine blue, shark grey, crab orange)
+
+Shows current species distribution at a glance. Useful for understanding ecosystem composition.
+
+---
+
+## Data Transformations
+
+All transformations happen in the chart component from raw `populationHistory`, `birthsHistory`, `deathsHistory`:
+
+```typescript
+// Ecosystem Balance
+predatorPressure = sharks / (sardines + plankton + 0.001)
+preyAbundance = (sardines + plankton) / totalPopulation
+
+// Population Pulse
+net = births - deaths
+
+// Current Distribution (no transformation, direct counts)
+```
+
+## Design Principles
+
+1. **Each chart answers one question** — no ambiguity
+2. **Derived metrics over raw counts** — show insights, not just data
+3. **Color with meaning** — green = good/growth, red = stress/decline, species colors = identity
+4. **Empty states** — helpful messages, no broken axes
+5. **Consistent styling** — 160px height, palette colors, testid preservation
+
+## Benefits
+
+- **UX improvement:** Users can instantly assess ecosystem health without mental math
+- **Critical thinking applied:** Charts tell a story, not just display numbers
+- **Actionable insights:** "Is my ecosystem collapsing?" is answered visually
+- **Species palette consistency:** All colors from existing palette, no hardcoded hex
+
+## Future Enhancements (out of scope for this session)
+
+- Header metrics row: Total Population, Predator:Prey Ratio, Trend (▲/▼/◼)
+- Energy level tracking (if backend provides per-species energy averages)
+- Extinction warnings (threshold-based alerts)
+
+
+# Stats Panel Flyover Design
+
+**Date:** 2026-02-23  
+**Author:** Lambert (Visual Designer)
+
+## Decision: Stats panel as collapsible glass overlay
+
+**Implementation:**
+- Stats panel positioned `absolute right-4 top-4` inside the simulation view
+- Glass effect: `backdrop-filter: blur(12px)` + `rgba(10, 22, 40, 0.88)` background
+- Border: `1px solid rgba(0, 180, 216, 0.3)` for subtle ocean accent
+- Box shadow: layered shadow for depth without harsh edges
+- Vertical toggle tab on left edge using `writingMode: vertical-rl`
+- Collapse animation: `translateX` transition 0.25s ease
+
+**Rationale:**
+- Gives ocean grid full viewport width by default
+- Glass panel doesn't fully obscure grid when expanded
+- Toggle tab is discoverable but doesn't compete with content
+- Consistent with deep-ocean dark palette already in use
+
+**Files changed:**
+- `frontend/src/App.tsx` — removed 65fr/35fr grid, now uses relative positioning
+- `frontend/src/components/stats/StatsPanel.tsx` — added glass styling, collapse state, species badges
+
+## Decision: Species count badges as 2x2 grid
+
+**Implementation:**
+- Four badges (plankton, sardine, shark, crab) in compact grid layout
+- Each badge: emoji + count, color-matched to species palette
+- Background: `rgba(255,255,255,0.05)` for subtle delineation
+
+**Rationale:**
+- Immediate population snapshot without reading charts
+- Emoji provides visual species identification
+- Compact layout maximizes space for graphs below
+
+## Breaking changes
+
+- `StatsPanel` no longer accepts `controls` prop — controls are now in footer (per Parker's work)
+- `data-testid="left-panel"` and `data-testid="right-panel"` removed; use `data-testid="simulation-view"` and `data-testid="stats-panel"` for E2E tests
+
+
+# Decision: Footer-Based Simulation Controls
+
+**Date:** 2026-02-24  
+**Agent:** Parker (Frontend Dev)  
+**Status:** Implemented
+
+## Context
+
+User requested moving simulation controls from the right stats panel to a fixed bottom footer across the entire viewport width. This improves accessibility and ensures controls are always visible regardless of panel scroll state.
+
+## Decision
+
+1. **SimulationControls now supports two layout variants:**
+   - `variant='sidebar'` (default): Vertical layout with grouped sections (Step, Auto-run), used for right-panel embedding
+   - `variant='footer'`: Horizontal single-row layout with all controls in a flex row, optimized for wide footer display
+
+2. **Footer placement:**
+   - Fixed position: `fixed bottom-0 left-0 right-0 z-20`
+   - Full-width, always visible when simulation started
+   - Styled consistently with header/panels: `bg-[#0f1f3d] border-t border-[rgba(0,180,216,0.2)]`
+
+3. **Layout adjustments:**
+   - Main content height adjusted from `h-[calc(100vh-56px)]` to `h-[calc(100vh-64px-72px)]` to prevent overlap
+   - Header increased from 56px (h-14) to 64px (h-16) for better readability
+   - Footer reserves ~72px (auto-height based on content + padding)
+
+4. **StatsPanel simplified:**
+   - Removed `controls?: ReactNode` prop (no longer needed)
+   - StatsPanel is now a pure data visualization component (floating glass overlay)
+   - No longer responsible for rendering controls
+
+## Rationale
+
+- **Always-visible controls**: Footer ensures Run/Stop buttons are always accessible without scrolling
+- **Wider screen real estate**: Horizontal layout makes better use of wide viewport, fits more controls in view
+- **Cleaner separation**: Stats panel focuses purely on visualization; controls have their own dedicated space
+- **Responsive-friendly**: Footer layout pattern is familiar and works well across screen sizes
+
+## Implementation Files
+
+- `frontend/src/App.tsx`: Added footer with `<SimulationControls variant="footer" />`, adjusted layout heights
+- `frontend/src/components/controls/SimulationControls.tsx`: Added `variant` prop with conditional rendering
+- `frontend/src/components/stats/StatsPanel.tsx`: Removed `controls` prop
+
+## Testing
+
+- TypeScript strict mode check passed (`npx tsc --noEmit`)
+- All existing `data-testid` attributes preserved for E2E tests
+- Footer only renders when `started === true`
+
+## Future Considerations
+
+- If mobile support needed, consider making footer sticky instead of fixed, or collapsible
+- Footer height is currently auto; could set explicit height if layout stability needed
+

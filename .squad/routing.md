@@ -11,6 +11,7 @@ How to decide who handles what.
 | React/TypeScript, UI, state management, real-time | Parker | Grid visualization, stats panel, WebSocket hooks, simulation controls, configuration inputs |
 | SVG illustrations, visual design, CSS, graphs | Lambert | Species SVG components, UI styling, Recharts graph components, color palette |
 | Tests (unit, integration, e2e), QA | Ash | xUnit tests, Jest tests, Playwright e2e, edge case analysis, coverage |
+| Charts, data visualization, KPIs, ecosystem metrics | Bishop | Recharts components, chart strategy, meaningful stats, data transformations |
 | Session logging | Scribe | Automatic — never needs routing |
 | Work queue, backlog monitoring | Ralph | Activated on demand |
 

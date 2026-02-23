@@ -11,6 +11,7 @@ interface SimulationControlsProps {
   onRunN: (n: number) => void;
   onRunUntilExtinction: (target: string) => void;
   onRunUntilEvent: () => void;
+  variant?: 'sidebar' | 'footer';
 }
 
 type BtnVariant = 'primary' | 'danger' | 'warning' | 'ghost';
@@ -80,11 +81,69 @@ export function SimulationControls({
   onRunN,
   onRunUntilExtinction,
   onRunUntilEvent,
+  variant = 'sidebar',
 }: SimulationControlsProps) {
   const [nValue, setNValue] = useState(10);
   const [extinctionTarget, setExtinctionTarget] = useState('all');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Footer variant — horizontal layout
+  if (variant === 'footer') {
+    return (
+      <div className="px-6 py-4 flex flex-row gap-4 items-center flex-wrap">
+        {/* Running indicator */}
+        {isRunning && (
+          <div className="flex items-center gap-2 py-2 px-3 bg-[rgba(0,180,216,0.1)] rounded-[7px] border border-[rgba(0,180,216,0.3)]">
+            <span className="inline-block w-2 h-2 rounded-full bg-[#00b4d8] animate-pulse" />
+            <span className="text-xs text-[#00b4d8] font-medium">Running…</span>
+          </div>
+        )}
+
+        {/* Step controls */}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <Btn onClick={onRunOne} disabled={isRunning} variant="primary" testId="btn-run-one">
+            ▶ Run 1
+          </Btn>
+          <input
+            ref={inputRef}
+            type="number"
+            value={nValue}
+            onChange={e => setNValue(parseInt(e.target.value) || 1)}
+            disabled={isRunning}
+            min={1} max={9999}
+            data-testid="input-n"
+            style={{ width: 52, padding: '7px 8px', background: '#0a1628', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#e8f4f8', fontSize: 13, textAlign: 'center' }}
+          />
+          <Btn onClick={() => onRunN(nValue)} disabled={isRunning} variant="primary" testId="btn-run-n">
+            ▶▶ Run N
+          </Btn>
+        </div>
+
+        {/* Auto-run controls */}
+        <Btn onClick={onRunUntilEvent} disabled={isRunning} variant="warning" testId="btn-run-event">
+          ⚡ Until Birth or Death
+        </Btn>
+
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <select
+            value={extinctionTarget}
+            onChange={e => setExtinctionTarget(e.target.value)}
+            disabled={isRunning}
+            style={{ padding: '7px 10px', background: '#0a1628', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#e8f4f8', fontSize: 13 }}
+          >
+            {SPECIES_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <Btn onClick={() => onRunUntilExtinction(extinctionTarget)} disabled={isRunning} variant="danger" testId="btn-run-extinction">
+            💀 Run Until Extinct
+          </Btn>
+        </div>
+      </div>
+    );
+  }
+
+  // Sidebar variant — vertical layout (default)
   return (
     <div className="px-4 pt-4 pb-3 flex flex-col gap-3.5 border-t border-[rgba(0,180,216,0.15)]">
       {/* Running indicator */}
