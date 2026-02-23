@@ -38,7 +38,7 @@ export function SimulationControls({
 
   return (
     <div className="simulation-controls p-4 space-y-4">
-      <div className="text-xl font-semibold mb-4">
+      <div className="text-xl font-semibold mb-4" data-testid="snapshot-number">
         Snapshot: {snapshotNumber}
       </div>
 
@@ -47,6 +47,7 @@ export function SimulationControls({
           onClick={onRunOne}
           disabled={isRunning}
           className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded text-white font-medium"
+          data-testid="btn-run-one"
         >
           Run 1 Snapshot
         </button>
@@ -59,11 +60,13 @@ export function SimulationControls({
             className="w-20 px-2 py-1 border rounded bg-gray-800 text-white"
             min={1}
             disabled={isRunning}
+            data-testid="input-n"
           />
           <button
             onClick={() => onRunN(nValue)}
             disabled={isRunning}
             className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded text-white font-medium"
+            data-testid="btn-run-n"
           >
             Run N
           </button>
@@ -86,6 +89,7 @@ export function SimulationControls({
             onClick={() => onRunUntilExtinction(extinctionTarget)}
             disabled={isRunning}
             className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 rounded text-white font-medium"
+            data-testid="btn-run-extinction"
           >
             Run Until Extinction
           </button>
@@ -95,6 +99,7 @@ export function SimulationControls({
           onClick={onRunUntilEvent}
           disabled={isRunning}
           className="col-span-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 rounded text-white font-medium"
+          data-testid="btn-run-event"
         >
           Run Until Next Event
         </button>
@@ -103,6 +108,7 @@ export function SimulationControls({
           onClick={onSave}
           disabled={isRunning}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded text-white font-medium"
+          data-testid="btn-save"
         >
           Save State
         </button>
@@ -120,6 +126,7 @@ export function SimulationControls({
           accept=".json"
           onChange={handleFileChange}
           className="hidden"
+          data-testid="input-load-file"
         />
       </div>
 

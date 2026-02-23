@@ -10,6 +10,7 @@ export function OceanGrid({ grid }: OceanGridProps) {
 
   return (
     <div
+      data-testid="ocean-grid"
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${grid.cols}, ${cellSize}px)`,
@@ -18,7 +19,7 @@ export function OceanGrid({ grid }: OceanGridProps) {
       }}
     >
       {grid.cells.flat().map((cell, i) => (
-        <GridCell key={i} specimenType={cell.specimenType} size={cellSize} />
+        <GridCell key={i} cell={cell} size={cellSize} />
       ))}
     </div>
   );

@@ -15,7 +15,7 @@ export function BirthDeathGraph({ birthsData, deathsData }: BirthDeathGraphProps
   }));
   
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div style={{ marginBottom: 16 }} data-testid="birth-death-graph">
       <h3 style={{ color: palette.textMuted, fontSize: 12, marginBottom: 8 }}>BIRTHS & DEATHS PER SNAPSHOT</h3>
       <ResponsiveContainer width="100%" height={130}>
         <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>

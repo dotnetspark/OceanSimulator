@@ -7,7 +7,7 @@ interface PopulationGraphProps {
 
 export function PopulationGraph({ data }: PopulationGraphProps) {
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div style={{ marginBottom: 16 }} data-testid="population-graph">
       <h3 style={{ color: palette.textMuted, fontSize: 12, marginBottom: 8 }}>POPULATION OVER TIME</h3>
       <ResponsiveContainer width="100%" height={160}>
         <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
