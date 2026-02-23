@@ -122,7 +122,7 @@ test.describe('Ocean Simulator E2E', () => {
   });
 
   test('TC6: Run until extinction stops when species gone', async ({ page }) => {
-    // Small ocean with few sardines, many sharks — sardines should go extinct fast
+    // Small ocean with few sardines, many sharks ΓÇö sardines should go extinct fast
     await configureSimulation(page, { 
       rows: 5, cols: 5,
       plankton: 2, sardines: 3, sharks: 8, crabs: 0, reefs: 0
@@ -131,7 +131,7 @@ test.describe('Ocean Simulator E2E', () => {
     // Click run until extinction (sardine)
     await page.click('[data-testid="btn-run-extinction"]');
     
-    // Wait for simulation to stop (up to 60s — small ocean, should be quick)
+    // Wait for simulation to stop (up to 60s ΓÇö small ocean, should be quick)
     await page.waitForFunction(() => {
       const btn = document.querySelector('[data-testid="btn-run-extinction"]') as HTMLButtonElement;
       return btn && !btn.disabled;
@@ -187,7 +187,7 @@ test.describe('Ocean Simulator E2E', () => {
     await page.click('[data-testid="btn-save"]');
     const download = await downloadPromise;
     
-    // Download completed — file exists
+    // Download completed ΓÇö file exists
     expect(download.suggestedFilename()).toBeTruthy();
     
     const savePath = `C:/tmp/ocean-save-test-${Date.now()}.json`;
