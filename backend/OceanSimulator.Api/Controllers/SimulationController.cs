@@ -146,22 +146,53 @@ public class SimulationController : ControllerBase
     }
     
     [HttpPost("save")]
-    public IActionResult Save()
+    public async Task<IActionResult> Save()
     {
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
-            
-        var grid = BuildGridResponse(_simulationService.Ocean!);
-        var json = System.Text.Json.JsonSerializer.Serialize(grid);
-        return File(System.Text.Encoding.UTF8.GetBytes(json), "application/json", "ocean-state.json");
+
+        var ms = new MemoryStream();
+        await _repository.SaveAsync(_simulationService.Ocean!, ms);
+        return File(ms.ToArray(), "application/json", "ocean-state.json");
     }
-    
+
     [HttpPost("load")]
-    public IActionResult Load(IFormFile file)
+    public async Task<IActionResult> Load(IFormFile file)
     {
-        // TODO: Implement load from uploaded file when IOceanRepository supports stream-based loading
-        // Currently LoadAsync only accepts string filePath, not a stream
-        return BadRequest("Load from file upload not yet implemented - repository needs stream support");
+        if (file == null || file.Length == 0)
+            return BadRequest("No file provided");
+
+        using var stream = file.OpenReadStream();
+        IOcean ocean;
+        try
+        {
+            ocean = await _repository.LoadAsync(stream);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Failed to load simulation state: {ex.Message}");
+        }
+
+        _simulationService.SetOcean(ocean);
+        var grid = BuildGridResponse(ocean);
+
+        return Ok(new
+        {
+            snapshotNumber = 0,
+            populationCounts = new
+            {
+                plankton    = ocean.GetSpecimenCount(SpecimenType.Plankton),
+                sardine     = ocean.GetSpecimenCount(SpecimenType.Sardine),
+                shark       = ocean.GetSpecimenCount(SpecimenType.Shark),
+                crab        = ocean.GetSpecimenCount(SpecimenType.Crab),
+                deadSardine = ocean.GetSpecimenCount(SpecimenType.DeadSardine),
+                deadShark   = ocean.GetSpecimenCount(SpecimenType.DeadShark)
+            },
+            totalBirths         = 0,
+            totalDeaths         = 0,
+            isExtinctionReached = false,
+            grid
+        });
     }
     
     [HttpPost("run/extinction")]

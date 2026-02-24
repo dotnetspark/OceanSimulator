@@ -22,32 +22,41 @@ public class JsonOceanRepository : IOceanRepository
     
     public async Task SaveAsync(IOcean ocean, string filePath)
     {
+        await using var fs = File.Create(filePath);
+        await SaveAsync(ocean, fs);
+    }
+
+    public async Task SaveAsync(IOcean ocean, Stream stream)
+    {
         var dto = new OceanDto
         {
             Rows = ocean.Rows,
             Cols = ocean.Cols,
-            Specimens = ocean.GetAllSpecimens().Select(s => SerializeSpecimen(s)).ToList()
+            Specimens = ocean.GetAllSpecimens().Select(SerializeSpecimen).ToList()
         };
-        
-        var json = JsonSerializer.Serialize(dto, _options);
-        await File.WriteAllTextAsync(filePath, json);
+        await JsonSerializer.SerializeAsync(stream, dto, _options);
     }
-    
+
     public async Task<IOcean> LoadAsync(string filePath)
     {
-        var json = await File.ReadAllTextAsync(filePath);
-        var dto = JsonSerializer.Deserialize<OceanDto>(json, _options);
-        
+        await using var fs = File.OpenRead(filePath);
+        return await LoadAsync(fs);
+    }
+
+    public async Task<IOcean> LoadAsync(Stream stream)
+    {
+        var dto = await JsonSerializer.DeserializeAsync<OceanDto>(stream, _options);
+
         if (dto == null)
             throw new InvalidOperationException("Failed to deserialize ocean");
-            
+
         var ocean = new Ocean(dto.Rows, dto.Cols);
         foreach (var specimenDto in dto.Specimens)
         {
             var specimen = DeserializeSpecimen(specimenDto);
             ocean.AddSpecimen(specimen);
         }
-        
+
         return ocean;
     }
     
