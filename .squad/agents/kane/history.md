@@ -99,3 +99,58 @@
 - `e90a85f` - "chore: add .gitignore and remove tracked build artifacts"
 - `941871a` - "feat: add Vite proxy to hide API behind frontend (single exposed port)"
 
+### 2025-02 — YARP Reverse Proxy Integration
+
+**Task:** Replace Vite `server.proxy` with proper Aspire YARP reverse proxy for production-ready single endpoint architecture.
+
+**Package Used:**
+- `Aspire.Hosting.Yarp` version `9.5.2-preview.1.25522.3`
+- Compatible with Aspire 9.3.0 and .NET 10.0
+- Official Microsoft Aspire package for YARP integration
+
+**API Pattern:**
+```csharp
+var proxy = builder.AddYarp("oceanproxy")
+    .WithExternalHttpEndpoints()
+    .WithConfiguration(yarp =>
+    {
+        // Route API calls to backend
+        yarp.AddRoute("/api/{**catch-all}", api);
+        
+        // Catch-all route for frontend (default)
+        yarp.AddRoute(frontend);
+    });
+```
+
+**Key Methods:**
+- `builder.AddYarp(name)` — Creates YARP reverse proxy resource
+- `.WithExternalHttpEndpoints()` — Makes proxy the only externally accessible endpoint
+- `.WithConfiguration(yarp => {...})` — Configures routing rules
+- `yarp.AddRoute(path, target)` — Adds route with path pattern to target resource
+- `yarp.AddRoute(target)` — Adds catch-all route (no path prefix)
+
+**Architecture Changes:**
+- YARP proxy is now the single external endpoint (replaces frontend direct exposure)
+- API remains internal-only (no `.WithExternalHttpEndpoints()`)
+- Frontend remains internal-only (no `.WithExternalHttpEndpoints()`)
+- `/api/*` requests routed to API resource
+- All other requests routed to frontend resource (Vite dev server)
+- Removed Vite `server.proxy` configuration (no longer needed)
+
+**Why YARP over Vite Proxy:**
+- Production-ready reverse proxy (YARP is Microsoft's production proxy)
+- Works in both dev and publish modes (Vite proxy only works in dev)
+- Proper gateway pattern for microservices
+- Supports advanced features (load balancing, transforms, health checks)
+- Single external endpoint for all traffic
+
+**Aspire SDK Build Behavior:**
+- Aspire.AppHost.Sdk 9.3.0 uses special build targets (no traditional DLL output in bin/)
+- AppHost projects must be run with `dotnet run`, not `dotnet run --no-build`
+- "Build succeeded" validates syntax and dependencies, doesn't produce standalone executable
+- AppHost projects don't support `Clean` or `Rebuild` targets
+- ASPIRE002 warning is expected with current SDK version combination
+
+**Commit:** `1305048` - "feat: replace Vite proxy with Aspire YARP reverse proxy (single external endpoint)"
+
+
