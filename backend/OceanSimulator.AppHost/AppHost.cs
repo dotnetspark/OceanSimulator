@@ -1,8 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Add the backend API project
-var api = builder.AddProject<Projects.OceanSimulator_Api>("api")
-    .WithExternalHttpEndpoints();
+var api = builder.AddProject<Projects.OceanSimulator_Api>("api");
 
 // Add the Vite frontend with npm integration
 var frontend = builder.AddNpmApp("frontend", "../../frontend", "dev")
