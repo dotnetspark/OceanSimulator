@@ -78,3 +78,28 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 - All public methods (`GetCellType`, `GetEmptyCells`, `GetAdjacentCellsOfType`, etc.) delegate to `GetSpecimenAt` — no changes needed there.
 - Build: 0 errors, 0 warnings.
 
+### 2026-02-23: Fixed API response shapes for frontend grid rendering
+
+**Problem:**
+- Frontend couldn't render grid because API returned wrong shapes
+- `initialize` returned `{ message, rows, cols }` but frontend expected full `OceanGrid` with `cells[][]`
+- `snapshot` returned `SnapshotResult` with PascalCase enum keys in populationCounts but frontend expected camelCase flat object
+- `snapshot` had no `grid` field
+- `run/extinction` returned `{ iterations, results[] }` but frontend expected single final `SnapshotResult`
+
+**Solution:**
+- Added `BuildGridResponse(IOcean ocean)` helper that iterates rows × cols and builds:
+  ```csharp
+  { rows, cols, cells: [[{ position: { row, col }, specimenType: "Water", specimenId: "..." }]] }
+  ```
+- Fixed `initialize` to return full grid response after `_simulationService.Initialize(config)`
+- Fixed `snapshot` to include `grid` field and transform populationCounts from `Dictionary<SpecimenType, int>` to camelCase flat object
+- Fixed `run/extinction` to return only the last snapshot result with grid (not array of results)
+- Fixed `save` to return JSON blob as file download (no body parameter)
+- Marked `load` as TODO — needs stream-based repository support for IFormFile uploads
+
+**Key files modified:**
+- `backend/OceanSimulator.Api/Controllers/SimulationController.cs`
+
+**Commit:** c861150
+

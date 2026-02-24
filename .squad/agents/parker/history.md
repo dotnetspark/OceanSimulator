@@ -106,4 +106,12 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 
 📌 Team update (2026-02-24T11-56-52.193Z): Merged four Aspire/Vite decisions from inbox. Kane fixed AppHost with AddNpmApp+WithReference. Parker configured vite.config.ts for service discovery proxy. Removed obsolete early Vite proxy decision (superseded by proper YARP+AddNpmApp+proxy architecture). Clear separation: YARP handles external traffic, AddNpmApp injects env vars, Vite proxy uses those vars for dev. Follow-up needed: update hardcoded localhost URLs in simulationApi.ts and useSignalR.ts to use relative paths. — decided by Kane, Parker
 
+### 2026-02-24: Undefined Grid Prop Bug Fix
+- **Type mismatch**: `OceanGridProps.grid` was typed as non-nullable `OceanGridType`, but `SimulationState.grid` is `OceanGrid | null` — runtime type mismatch caused crash on line 43 when calling `grid.cells.flat()` before simulation data loaded
+- **Fix**: Changed `OceanGridProps.grid` type to `OceanGridType | null | undefined`; added early return with loading message when `grid` is falsy
+- **Pattern**: Always align component prop types with the actual state shape that feeds them; nullable state → nullable props
+- **User experience**: Component now renders gracefully ("Loading ocean…") instead of crashing when grid data hasn't arrived yet
+- **TypeScript compliance**: Zero errors with strict mode + verbatimModuleSyntax after fix
+- **Key file**: `frontend/src/components/grid/OceanGrid.tsx`
+
 
