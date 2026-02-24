@@ -1,0 +1,22 @@
+# .NET build artifacts
+**/bin/
+**/obj/
+
+# Node.js
+node_modules/
+frontend/node_modules/
+
+# Playwright test artifacts
+frontend/playwright-screenshots/
+frontend/test-*.cjs
+frontend/*.cjs
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db

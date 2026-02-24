@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OceanSimulator.Api.DTOs;
 using OceanSimulator.Api.Services;
 using OceanSimulator.Application.DTOs;
+using OceanSimulator.Domain.Entities;
 using OceanSimulator.Domain.Enums;
 using OceanSimulator.Domain.Interfaces;
 
@@ -24,7 +25,51 @@ public class SimulationController : ControllerBase
         _orchestrator = orchestrator;
         _repository = repository;
     }
-    
+
+    // ── helpers ─────────────────────────────────────────────────────────────
+
+    private static OceanGridApiDto BuildGrid(IOcean ocean)
+    {
+        var cells = new CellApiDto[ocean.Rows][];
+        for (int row = 0; row < ocean.Rows; row++)
+        {
+            cells[row] = new CellApiDto[ocean.Cols];
+            for (int col = 0; col < ocean.Cols; col++)
+            {
+                var pos = new OceanSimulator.Domain.ValueObjects.Position(row, col);
+                var specimen = ocean.GetSpecimenAt(pos);
+                cells[row][col] = new CellApiDto
+                {
+                    Position = new PositionApiDto { Row = row, Col = col },
+                    SpecimenType = (specimen?.Type ?? SpecimenType.Water).ToString(),
+                    SpecimenId = specimen?.Id.ToString()
+                };
+            }
+        }
+        return new OceanGridApiDto { Rows = ocean.Rows, Cols = ocean.Cols, Cells = cells };
+    }
+
+    private static SnapshotApiResponseDto BuildResponse(SnapshotResult result, IOcean ocean) =>
+        new()
+        {
+            SnapshotNumber = result.SnapshotNumber,
+            PopulationCounts = new PopulationCountsApiDto
+            {
+                Plankton    = result.PopulationCounts.GetValueOrDefault(SpecimenType.Plankton, 0),
+                Sardine     = result.PopulationCounts.GetValueOrDefault(SpecimenType.Sardine,  0),
+                Shark       = result.PopulationCounts.GetValueOrDefault(SpecimenType.Shark,    0),
+                Crab        = result.PopulationCounts.GetValueOrDefault(SpecimenType.Crab,     0),
+                DeadSardine = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadSardine, 0),
+                DeadShark   = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadShark,   0),
+            },
+            TotalBirths        = result.TotalBirths,
+            TotalDeaths        = result.TotalDeaths,
+            IsExtinctionReached = result.IsExtinctionReached,
+            Grid = BuildGrid(ocean)
+        };
+
+    // ── endpoints ────────────────────────────────────────────────────────────
+
     [HttpPost("initialize")]
     public IActionResult Initialize([FromBody] SimulationConfigDto configDto)
     {
@@ -44,37 +89,34 @@ public class SimulationController : ControllerBase
             configDto.Seed);
             
         _simulationService.Initialize(config);
-        
-        return Ok(new { message = "Simulation initialized", rows = config.Rows, cols = config.Cols });
+        return Ok(BuildGrid(_simulationService.Ocean!));
     }
     
     [HttpPost("snapshot")]
-    public async Task<IActionResult> ExecuteSnapshot()
+    public async Task<IActionResult> ExecuteSnapshot(CancellationToken cancellationToken)
     {
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
             
-        var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!);
-        return Ok(result);
+        var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!, cancellationToken);
+        return Ok(BuildResponse(result, _simulationService.Ocean!));
     }
     
     [HttpPost("snapshots/{n}")]
-    public async Task<IActionResult> ExecuteNSnapshots(int n)
+    public async Task<IActionResult> ExecuteNSnapshots(int n, CancellationToken cancellationToken)
     {
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
-            
-        var results = new List<object>();
+
+        SnapshotResult? last = null;
         for (int i = 0; i < n; i++)
         {
-            var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!);
-            results.Add(result);
-            
-            if (result.IsExtinctionReached)
-                break;
+            if (cancellationToken.IsCancellationRequested) break;
+            last = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!, cancellationToken);
+            if (last.IsExtinctionReached) break;
         }
         
-        return Ok(results);
+        return Ok(last is null ? null : BuildResponse(last, _simulationService.Ocean!));
     }
     
     [HttpGet("state")]
@@ -84,79 +126,116 @@ public class SimulationController : ControllerBase
             return BadRequest("Simulation not initialized");
             
         var ocean = _simulationService.Ocean!;
-        var populations = new Dictionary<string, int>();
-        
-        foreach (SpecimenType type in Enum.GetValues<SpecimenType>())
-        {
-            if (type != SpecimenType.Water)
-            {
-                populations[type.ToString()] = ocean.GetSpecimenCount(type);
-            }
-        }
-        
         return Ok(new
         {
-            rows = ocean.Rows,
-            cols = ocean.Cols,
-            populations
+            snapshotNumber = 0,
+            populationCounts = new PopulationCountsApiDto
+            {
+                Plankton    = ocean.GetSpecimenCount(SpecimenType.Plankton),
+                Sardine     = ocean.GetSpecimenCount(SpecimenType.Sardine),
+                Shark       = ocean.GetSpecimenCount(SpecimenType.Shark),
+                Crab        = ocean.GetSpecimenCount(SpecimenType.Crab),
+                DeadSardine = ocean.GetSpecimenCount(SpecimenType.DeadSardine),
+                DeadShark   = ocean.GetSpecimenCount(SpecimenType.DeadShark),
+            },
+            totalBirths = 0,
+            totalDeaths = 0,
+            isExtinctionReached = false,
+            grid = BuildGrid(ocean)
+        });
+    }
+
+    [HttpPost("save")]
+    public async Task<IActionResult> Save()
+    {
+        if (!_simulationService.IsInitialized)
+            return BadRequest("Simulation not initialized");
+
+        var tempPath = Path.Combine(Path.GetTempPath(), $"ocean-{Guid.NewGuid()}.json");
+        await _repository.SaveAsync(_simulationService.Ocean!, tempPath);
+        var bytes = await System.IO.File.ReadAllBytesAsync(tempPath);
+        System.IO.File.Delete(tempPath);
+        return File(bytes, "application/json", "ocean-state.json");
+    }
+
+    [HttpPost("load")]
+    public async Task<IActionResult> Load(IFormFile file)
+    {
+        var tempPath = Path.Combine(Path.GetTempPath(), $"ocean-load-{Guid.NewGuid()}.json");
+        await using (var stream = System.IO.File.Create(tempPath))
+            await file.CopyToAsync(stream);
+
+        var ocean = await _repository.LoadAsync(tempPath);
+        System.IO.File.Delete(tempPath);
+        _simulationService.SetOcean(ocean);
+
+        var counts = new PopulationCountsApiDto
+        {
+            Plankton    = ocean.GetSpecimenCount(SpecimenType.Plankton),
+            Sardine     = ocean.GetSpecimenCount(SpecimenType.Sardine),
+            Shark       = ocean.GetSpecimenCount(SpecimenType.Shark),
+            Crab        = ocean.GetSpecimenCount(SpecimenType.Crab),
+            DeadSardine = ocean.GetSpecimenCount(SpecimenType.DeadSardine),
+            DeadShark   = ocean.GetSpecimenCount(SpecimenType.DeadShark),
+        };
+        return Ok(new SnapshotApiResponseDto
+        {
+            SnapshotNumber = 0,
+            PopulationCounts = counts,
+            TotalBirths = 0,
+            TotalDeaths = 0,
+            IsExtinctionReached = false,
+            Grid = BuildGrid(ocean)
         });
     }
     
-    [HttpPost("save")]
-    public async Task<IActionResult> Save([FromBody] string filePath)
-    {
-        if (!_simulationService.IsInitialized)
-            return BadRequest("Simulation not initialized");
-            
-        await _repository.SaveAsync(_simulationService.Ocean!, filePath);
-        return Ok(new { message = "Simulation saved", filePath });
-    }
-    
-    [HttpPost("load")]
-    public async Task<IActionResult> Load([FromBody] string filePath)
-    {
-        var ocean = await _repository.LoadAsync(filePath);
-        _simulationService.SetOcean(ocean);
-        return Ok(new { message = "Simulation loaded", filePath });
-    }
-    
     [HttpPost("run/extinction")]
-    public async Task<IActionResult> RunUntilExtinction([FromBody] RunUntilExtinctionRequest request)
+    public async Task<IActionResult> RunUntilExtinction([FromBody] RunUntilExtinctionRequest request, CancellationToken cancellationToken)
     {
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
-            
-        var results = new List<object>();
+
+        SnapshotResult? last = null;
         int maxIterations = 10000;
-        int iteration = 0;
-        
-        while (iteration < maxIterations)
+
+        for (int i = 0; i < maxIterations; i++)
         {
-            var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!);
-            results.Add(result);
-            iteration++;
-            
-            if (request.Target.ToLower() == "sardine")
+            if (cancellationToken.IsCancellationRequested) break;
+            last = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!, cancellationToken);
+
+            bool done = request.Target.ToLowerInvariant() switch
             {
-                if (result.PopulationCounts.GetValueOrDefault(SpecimenType.Sardine, 0) == 0)
-                    break;
-            }
-            else if (request.Target.ToLower() == "all")
-            {
-                if (result.IsExtinctionReached)
-                    break;
-            }
+                "plankton"   => last.PopulationCounts.GetValueOrDefault(SpecimenType.Plankton, 0) == 0,
+                "sardine"    => last.PopulationCounts.GetValueOrDefault(SpecimenType.Sardine,  0) == 0,
+                "shark"      => last.PopulationCounts.GetValueOrDefault(SpecimenType.Shark,    0) == 0,
+                "crab"       => last.PopulationCounts.GetValueOrDefault(SpecimenType.Crab,     0) == 0,
+                _            => last.IsExtinctionReached
+            };
+
+            if (done) break;
         }
         
-        return Ok(new { iterations = iteration, results });
+        return Ok(last is null ? null : BuildResponse(last, _simulationService.Ocean!));
     }
     
     [HttpPost("run/event")]
-    public async Task<IActionResult> RunUntilEvent([FromBody] string eventType)
+    public async Task<IActionResult> RunUntilEvent(CancellationToken cancellationToken)
     {
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
-            
-        return Ok(new { message = "RunUntilEvent not yet implemented" });
+
+        // Run snapshots until a birth or death occurs
+        int maxIterations = 10000;
+        for (int i = 0; i < maxIterations; i++)
+        {
+            if (cancellationToken.IsCancellationRequested) break;
+            var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!, cancellationToken);
+            if (result.TotalBirths > 0 || result.TotalDeaths > 0 || result.IsExtinctionReached)
+                return Ok(BuildResponse(result, _simulationService.Ocean!));
+        }
+
+        // No event found — return current state
+        var last = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!, cancellationToken);
+        return Ok(BuildResponse(last, _simulationService.Ocean!));
     }
 }

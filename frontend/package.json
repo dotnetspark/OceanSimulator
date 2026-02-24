@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@microsoft/signalr": "^10.0.0",
+    "@playwright/test": "^1.58.2",
     "@types/recharts": "^1.8.29",
+    "playwright": "^1.58.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "recharts": "^3.7.0"

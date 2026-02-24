@@ -6,7 +6,7 @@ namespace OceanSimulator.Domain.Entities;
 
 public class Ocean : IOcean
 {
-    private readonly ISpecimen?[,] _grid;
+    private readonly Dictionary<Position, ISpecimen> _grid = new();
     private readonly List<ISpecimen> _specimens = new();
     
     public int Rows { get; }
@@ -16,21 +16,23 @@ public class Ocean : IOcean
     {
         Rows = rows;
         Cols = cols;
-        _grid = new ISpecimen?[rows, cols];
     }
     
     public ISpecimen? GetSpecimenAt(Position position)
     {
         if (position.Row < 0 || position.Row >= Rows || position.Col < 0 || position.Col >= Cols)
             return null;
-        return _grid[position.Row, position.Col];
+        return _grid.TryGetValue(position, out var s) ? s : null;
     }
     
     public void SetSpecimenAt(Position position, ISpecimen? specimen)
     {
         if (position.Row < 0 || position.Row >= Rows || position.Col < 0 || position.Col >= Cols)
             return;
-        _grid[position.Row, position.Col] = specimen;
+        if (specimen is null)
+            _grid.Remove(position);
+        else
+            _grid[position] = specimen;
     }
     
     public SpecimenType GetCellType(Position position)
