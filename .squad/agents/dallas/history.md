@@ -19,9 +19,29 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 
 **IRandomProvider:** Must be injectable. All randomness (movement direction, attack outcome, specimen ordering) goes through this interface for determinism when seeded.
 
-## Learnings
+### 2026-02-23: CI Pipeline — squad-ci.yml rewrite + e2e.yml
 
-<!-- Append new learnings below. Each entry is something lasting about the project. -->
+**What changed:**
+- Rewrote `.github/workflows/squad-ci.yml` (was a stub with no commands):
+  - Renamed to `CI` (was "Squad CI")
+  - Triggers: `pull_request` (main, dev, preview) + `push` (main, dev)
+  - Two jobs: `backend` (.NET 10, xUnit, uploads *.trx artifacts) and `frontend` (Node 20, Vitest `--run`)
+  - Job names `backend` and `frontend` are exact — used in branch protection rules
+- Created `.github/workflows/e2e.yml`:
+  - `workflow_dispatch` only (manual — E2E needs running backend)
+  - Installs Playwright chromium, runs `npm run test:e2e`
+  - Uploads playwright-report artifact on failure
+- Added README badges: CI, E2E, License MIT, .NET 10, Node.js 20+
+
+**Key decisions:**
+- E2E kept manual (`workflow_dispatch`) because it needs a live backend; not a PR gate
+- Frontend test command is `npm run test -- --run` (Vitest headless, not `npm test`)
+- Backend artifact `if: always()` ensures .trx files upload even on test failure
+- `cache-dependency-path: frontend/package-lock.json` scopes npm cache to frontend lockfile
+
+**Commit:** 1d1de8b
+
+
 
 ### 2026-02-23: Backend Implementation Complete (Issues #1-7)
 
