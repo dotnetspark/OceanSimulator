@@ -4,13 +4,25 @@ import type { OceanGrid as OceanGridType } from '../../types/simulation.types';
 import type { CellChangeType } from '../../hooks/useGridDiff';
 
 interface OceanGridProps {
-  grid: OceanGridType;
+  grid: OceanGridType | null | undefined;
   changedCells?: Map<string, CellChangeType>;
 }
 
 export function OceanGrid({ grid, changedCells }: OceanGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState(600);
+
+  // Early return if grid is not yet loaded
+  if (!grid) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-center text-[#7a9bb5]">
+          <div className="text-5xl mb-3">🌊</div>
+          <div className="text-sm">Loading ocean…</div>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (!containerRef.current) return;
