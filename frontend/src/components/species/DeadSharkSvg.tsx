@@ -1,23 +1,24 @@
-interface SpeciesSvgProps {
-  size?: number;
-  colorTheme?: 'default' | 'high-contrast';
-  animationEnabled?: boolean;
-}
+import { palette } from '../../styles/palette';
+import type { SpeciesSvgProps } from './PlanktonSvg';
 
-export function DeadSharkSvg({ size = 32, colorTheme = 'default', animationEnabled = false }: SpeciesSvgProps) {
+export function DeadSharkSvg({ size = 24, animated: _animated = false, animState = 'normal' }: SpeciesSvgProps) {
+  let animClass = '';
+  if (animState === 'born') animClass = 'species-born';
+  if (animState === 'dying') animClass = 'species-dying';
+  
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Body — faded */}
-      <ellipse cx="15" cy="17" rx="13" ry="7" fill="#3a4a5a" />
-      <polygon points="2,17 6,13 6,21" fill="#2a3a4a" />
-      <polygon points="28,17 32,11 32,23" fill="#2a3a4a" />
-      {/* Dorsal fin */}
-      <polygon points="14,10 18,3 22,10" fill="#2e3e4e" />
-      {/* Belly */}
-      <ellipse cx="14" cy="19" rx="9" ry="3.5" fill="#4a5a6a" fillOpacity="0.4" />
-      {/* X Eye */}
-      <line x1="4" y1="14" x2="8" y2="18" stroke="#e8f4f8" strokeWidth="1.5" strokeOpacity="0.6" />
-      <line x1="8" y1="14" x2="4" y2="18" stroke="#e8f4f8" strokeWidth="1.5" strokeOpacity="0.6" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.7 }}>
+      <g className={animClass}>
+        {/* Crescent tail — desaturated */}
+        <polygon points="21,12 24,7 24,17" fill={palette.deadDark} />
+        {/* Torpedo body — grey */}
+        <ellipse cx="11" cy="12" rx="10" ry="5" fill={palette.dead} />
+        {/* Dorsal fin - KEY identifier */}
+        <polygon points="8,7 11,1 14,7" fill={palette.deadDark} />
+        {/* X eye marks */}
+        <line x1="3" y1="10" x2="6" y2="13" stroke="#e8f4f8" strokeWidth="1.5" />
+        <line x1="6" y1="10" x2="3" y2="13" stroke="#e8f4f8" strokeWidth="1.5" />
+      </g>
     </svg>
   );
 }

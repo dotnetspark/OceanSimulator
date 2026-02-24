@@ -1,30 +1,56 @@
 import React from 'react';
 import type { Cell } from '../../types/simulation.types';
-import { PlanktonSvg, SardineSvg, SharkSvg, CrabSvg, ReefSvg, DeadSardineSvg, DeadSharkSvg } from '../species';
+import type { CellChangeType } from '../../hooks/useGridDiff';
 
 interface GridCellProps {
   cell: Cell;
   size: number;
+  animState?: CellChangeType;
 }
 
-const SvgMap: Partial<Record<string, React.ComponentType<{ size: number }>>> = {
-  Plankton: PlanktonSvg,
-  Sardine: SardineSvg,
-  Shark: SharkSvg,
-  Crab: CrabSvg,
-  Reef: ReefSvg,
-  DeadSardine: DeadSardineSvg,
-  DeadShark: DeadSharkSvg,
+const EmojiMap: Partial<Record<string, string>> = {
+  Plankton:    '🦐',
+  Sardine:     '🐟',
+  Shark:       '🦈',
+  Crab:        '🦀',
+  Reef:        '🪸',
+  DeadSardine: '🐟',
+  DeadShark:   '🦈',
 };
 
-export const GridCell = React.memo(({ cell, size }: GridCellProps) => {
-  const SvgComponent = SvgMap[cell.specimenType];
+const isDead = (t: string) => t === 'DeadSardine' || t === 'DeadShark';
+
+export const GridCell = React.memo(({ cell, size, animState }: GridCellProps) => {
+  const emoji = EmojiMap[cell.specimenType];
+  const dead = isDead(cell.specimenType);
+  const fontSize = Math.max(10, Math.floor(size * 0.72));
+
+  let animClass = '';
+  if (animState === 'born') animClass = 'species-born';
+  else if (animState === 'died') animClass = 'species-dying';
+  else if (animState === 'moved') animClass = 'species-moving';
+
   return (
-    <div 
+    <div
       data-testid={`cell-${cell.position.row}-${cell.position.col}`}
-      style={{ width: size, height: size, background: '#0d1b2a', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      data-anim={animState}
+      className="flex items-center justify-center bg-[#b8d8e8]"
+      style={{ width: size, height: size }}
     >
-      {SvgComponent && <SvgComponent size={Math.max(16, size - 4)} />}
+      {emoji && (
+        <span
+          className={animClass || undefined}
+          style={{
+            fontSize,
+            lineHeight: 1,
+            opacity: dead ? 0.45 : 1,
+            filter: dead ? 'grayscale(80%)' : undefined,
+            display: 'block',
+          }}
+        >
+          {emoji}
+        </span>
+      )}
     </div>
   );
 });

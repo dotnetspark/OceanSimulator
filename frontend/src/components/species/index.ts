@@ -1,4 +1,5 @@
 export { PlanktonSvg } from './PlanktonSvg';
+export type { SpeciesSvgProps } from './PlanktonSvg';
 export { SardineSvg } from './SardineSvg';
 export { SharkSvg } from './SharkSvg';
 export { CrabSvg } from './CrabSvg';
