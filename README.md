@@ -1,6 +1,12 @@
 # Ocean Simulator
 
-A full-stack marine ecosystem simulator. A 2D grid of ocean cells evolves through **Snapshots** — each specimen moves once per snapshot in randomized order, following species-specific predator-prey behaviors.
+[![CI](https://github.com/dotnetspark/OceanSimulator/actions/workflows/squad-ci.yml/badge.svg)](https://github.com/dotnetspark/OceanSimulator/actions/workflows/squad-ci.yml)
+[![E2E](https://github.com/dotnetspark/OceanSimulator/actions/workflows/e2e.yml/badge.svg)](https://github.com/dotnetspark/OceanSimulator/actions/workflows/e2e.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs)](https://nodejs.org/)
+
+A full-stack marine ecosystem simulator.A 2D grid of ocean cells evolves through **Snapshots** — each specimen moves once per snapshot in randomized order, following species-specific predator-prey behaviors.
 
 ## Stack
 
