@@ -60,6 +60,7 @@ The project uses **.NET Aspire** for orchestration. A single command starts ever
 
 ### Prerequisites
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — required for the YARP reverse proxy container
 - [Node.js 18+](https://nodejs.org/)
 - [.NET Aspire workload](https://learn.microsoft.com/dotnet/aspire/fundamentals/setup-tooling): `dotnet workload install aspire`
 
