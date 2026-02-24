@@ -7,7 +7,6 @@ namespace OceanSimulator.Domain.Entities;
 public class Ocean : IOcean
 {
     private readonly Dictionary<Position, ISpecimen> _grid = new();
-    private readonly HashSet<ISpecimen> _specimens = new();
     
     public int Rows { get; }
     public int Cols { get; }
@@ -61,32 +60,26 @@ public class Ocean : IOcean
     
     public void AddSpecimen(ISpecimen specimen)
     {
-        _specimens.Add(specimen);
         SetSpecimenAt(specimen.Position, specimen);
     }
     
     public void RemoveSpecimen(Position position)
     {
-        var specimen = GetSpecimenAt(position);
-        if (specimen != null)
-        {
-            _specimens.Remove(specimen);
-            SetSpecimenAt(position, null);
-        }
+        _grid.Remove(position);
     }
     
     public IEnumerable<ISpecimen> GetAllSpecimens()
     {
-        return _specimens;
+        return _grid.Values;
     }
     
     public IEnumerable<ISpecimen> GetSpecimensOfType(SpecimenType type)
     {
-        return _specimens.Where(s => s.Type == type);
+        return _grid.Values.Where(s => s.Type == type);
     }
     
     public int GetSpecimenCount(SpecimenType type)
     {
-        return _specimens.Count(s => s.Type == type);
+        return _grid.Values.Count(s => s.Type == type);
     }
 }
