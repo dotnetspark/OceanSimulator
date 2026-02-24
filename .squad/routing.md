@@ -12,6 +12,7 @@ How to decide who handles what.
 | SVG illustrations, visual design, CSS, graphs | Lambert | Species SVG components, UI styling, Recharts graph components, color palette |
 | Tests (unit, integration, e2e), QA | Ash | xUnit tests, Jest tests, Playwright e2e, edge case analysis, coverage |
 | Charts, data visualization, KPIs, ecosystem metrics | Bishop | Recharts components, chart strategy, meaningful stats, data transformations |
+| Aspire orchestration, DevOps, service hosting, Docker | Kane | .NET Aspire AppHost, service discovery, npm/Vite integration, containerization, CI/CD |
 | Session logging | Scribe | Automatic — never needs routing |
 | Work queue, backlog monitoring | Ralph | Activated on demand |
 
@@ -25,6 +26,7 @@ How to decide who handles what.
 | `squad:parker` | Pick up issue and complete the work | Parker |
 | `squad:lambert` | Pick up issue and complete the work | Lambert |
 | `squad:ash` | Pick up issue and complete the work | Ash |
+| `squad:kane` | Pick up issue and complete the work | Kane |
 
 ## Rules
 

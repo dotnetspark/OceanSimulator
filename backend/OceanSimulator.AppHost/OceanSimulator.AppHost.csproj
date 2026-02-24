@@ -1,0 +1,21 @@
+<Project Sdk="Aspire.AppHost.Sdk/9.3.0">
+
+  <ItemGroup>
+    <ProjectReference Include="..\OceanSimulator.Api\OceanSimulator.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
+    <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.3.0" />
+    <PackageReference Include="Aspire.Hosting.Yarp" Version="13.1.1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>1087cd8c-b36a-4879-917b-85bf971ca221</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

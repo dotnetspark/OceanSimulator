@@ -8,7 +8,7 @@ A full-stack marine ecosystem simulator. A 2D grid of ocean cells evolves throug
 graph TB
     UI["React 18<br/>TypeScript<br/>Vite"]
     API["SignalR Hub<br/>REST API"]
-    BL["Clean Architecture<br/>C# .NET 8"]
+    BL["Clean Architecture<br/>C# .NET 10"]
     Test["xUnit, Vitest<br/>Playwright"]
     
     UI -->|WebSocket/HTTP| API
@@ -54,42 +54,29 @@ graph LR
 - **Crab:** Scavenges dead specimens; cannot starve or breed
 - **Reef:** Static obstacle; never moves
 
-## Getting Started
+## Running the Project
+
+The project uses **.NET Aspire** for orchestration. A single command starts everything — the backend API, the Vite frontend, and the YARP reverse proxy.
 
 ### Prerequisites
-- .NET 8 SDK
-- Node.js 20+
-- (Optional) Visual Studio 2022 or VS Code
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — required for the YARP reverse proxy container
+- [Node.js 18+](https://nodejs.org/)
+- [.NET Aspire workload](https://learn.microsoft.com/dotnet/aspire/fundamentals/setup-tooling): `dotnet workload install aspire`
 
-### Backend
-
-```bash
-cd backend
-dotnet restore
-dotnet run --project OceanSimulator.Api
-# API available at http://localhost:5000
-# Swagger UI at http://localhost:5000/swagger
-```
-
-### Frontend
+### Start
 
 ```bash
-cd frontend
-npm install
-cp .env.example .env   # edit VITE_API_URL if needed
-npm run dev
-# App at http://localhost:5173
+dotnet run --project backend/OceanSimulator.AppHost
 ```
 
-### Run Both
+This launches:
+- 🔧 **Backend API** (internal, routed via proxy)
+- ⚡ **Vite dev server** (internal, static files served via proxy)
+- 🌐 **YARP Proxy** — the single exposed endpoint for the app
+- 📊 **Aspire Dashboard** at `http://localhost:15888` — logs, traces, health checks
 
-```bash
-# Terminal 1 — backend
-cd backend && dotnet run --project OceanSimulator.Api
-
-# Terminal 2 — frontend
-cd frontend && npm run dev
-```
+The app is available at the proxy URL shown in the Aspire dashboard.
 
 ## Testing
 

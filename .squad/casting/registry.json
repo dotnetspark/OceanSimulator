@@ -41,6 +41,13 @@
       "created_at": "2026-02-23T21:06:03.099Z",
       "legacy_named": false,
       "status": "active"
+    },
+    "kane": {
+      "persistent_name": "Kane",
+      "universe": "Alien",
+      "created_at": "2026-02-24T06:28:15.000Z",
+      "legacy_named": false,
+      "status": "active"
     }
   }
 }
