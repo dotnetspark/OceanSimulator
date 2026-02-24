@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OceanSimulator.Api", "Ocean
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OceanSimulator.Tests", "OceanSimulator.Tests\OceanSimulator.Tests.csproj", "{86B82972-60B3-4485-BD2C-97706F48FB98}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OceanSimulator.AppHost", "OceanSimulator.AppHost\OceanSimulator.AppHost.csproj", "{CCB07009-A692-405B-9F15-69F134B6A8DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OceanSimulator.ServiceDefaults", "OceanSimulator.ServiceDefaults\OceanSimulator.ServiceDefaults.csproj", "{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,30 @@ Global
 		{86B82972-60B3-4485-BD2C-97706F48FB98}.Release|x64.Build.0 = Release|Any CPU
 		{86B82972-60B3-4485-BD2C-97706F48FB98}.Release|x86.ActiveCfg = Release|Any CPU
 		{86B82972-60B3-4485-BD2C-97706F48FB98}.Release|x86.Build.0 = Release|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Debug|x64.Build.0 = Debug|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Debug|x86.Build.0 = Debug|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Release|x64.ActiveCfg = Release|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Release|x64.Build.0 = Release|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Release|x86.ActiveCfg = Release|Any CPU
+		{CCB07009-A692-405B-9F15-69F134B6A8DD}.Release|x86.Build.0 = Release|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Debug|x64.Build.0 = Debug|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Debug|x86.Build.0 = Debug|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Release|x64.ActiveCfg = Release|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Release|x64.Build.0 = Release|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Release|x86.ActiveCfg = Release|Any CPU
+		{DE8FA72E-7979-42B1-8ADC-7D5934B4B431}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

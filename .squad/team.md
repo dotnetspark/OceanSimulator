@@ -18,6 +18,7 @@
 | Lambert | Visual Designer | `.squad/agents/lambert/charter.md` | ✅ Active |
 | Ash | Tester | `.squad/agents/ash/charter.md` | ✅ Active |
 | Bishop | Data Analyst | `.squad/agents/bishop/charter.md` | ✅ Active |
+| Kane | DevOps / Aspire | `.squad/agents/kane/charter.md` | ✅ Active |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | — | 🔄 Monitor |
 

@@ -33,7 +33,7 @@ export function OceanGrid({ grid, changedCells }: OceanGridProps) {
     <div ref={containerRef} className="w-full h-full flex items-center justify-center">
       <div
         data-testid="ocean-grid"
-        className="bg-black"
+        className="bg-[#8cc4d8]"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${grid.cols}, ${cellSize}px)`,

@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import type { SimulationConfig } from '../../types/simulation.types';
 
-const BG = '#0a1628';
-const PANEL_BG = '#0f1f3d';
-const BORDER = '#1e4060';
+const BG = '#f5f8fc';
+const PANEL_BG = '#ffffff';
+const BORDER = '#d0dde8';
 const ACCENT = '#00b4d8';
-const MUTED = '#7a9bb5';
+const MUTED = '#5a7a96';
 
 const SPECIES = [
-  { key: 'initialPlankton', label: 'Plankton', emoji: '🌿', color: '#7ec8a0', max: 200 },
+  { key: 'initialPlankton', label: 'Plankton', emoji: '🦐', color: '#7ec8a0', max: 200 },
   { key: 'initialSardines', label: 'Sardines', emoji: '🐟', color: '#89b4d8', max: 100 },
-  { key: 'initialSharks', label: 'Sharks', emoji: '🦈', color: '#546e7a', max: 50 },
-  { key: 'initialCrabs', label: 'Crabs', emoji: '🦀', color: '#e07b39', max: 50 },
-  { key: 'initialReefs', label: 'Reefs', emoji: '🪸', color: '#8b7355', max: 100 },
+  { key: 'initialSharks',   label: 'Sharks',   emoji: '🦈', color: '#546e7a', max: 50 },
+  { key: 'initialCrabs',    label: 'Crabs',    emoji: '🦀', color: '#e07b39', max: 50 },
+  { key: 'initialReefs',    label: 'Reefs',    emoji: '🪸', color: '#8b7355', max: 100 },
 ] as const;
 
 interface ConfigPanelProps {
@@ -21,7 +21,7 @@ interface ConfigPanelProps {
 
 function SectionCard({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: PANEL_BG, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 20 }}>
+    <div style={{ background: PANEL_BG, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
       <div style={{ fontSize: 14, fontWeight: 600, color: ACCENT, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
         <span>{icon}</span> {title}
       </div>
@@ -44,7 +44,7 @@ function NumberInput({ value, onChange, min = 0, max = 999 }: { value: number; o
         background: BG,
         border: `1px solid ${BORDER}`,
         borderRadius: 6,
-        color: '#e8f4f8',
+        color: '#0a1628',
         fontSize: 14,
         textAlign: 'center',
       }}
@@ -77,12 +77,12 @@ export function ConfigPanel({ onStart }: ConfigPanelProps) {
   };
 
   return (
-    <div style={{ minHeight: 'calc(100vh - 56px)', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+    <div style={{ flex: 1, overflowY: 'auto', background: BG, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 32 }}>
       <div style={{ width: '100%', maxWidth: 680 }}>
         {/* Hero */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>🌊</div>
-          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#e8f4f8' }}>Configure Your Ocean</h1>
+          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#0a1628' }}>Configure Your Ocean</h1>
           <p style={{ margin: '8px 0 0', color: MUTED, fontSize: 15 }}>Set up the ecosystem before the simulation begins</p>
         </div>
 
@@ -99,13 +99,13 @@ export function ConfigPanel({ onStart }: ConfigPanelProps) {
                       type="range"
                       value={config[field]}
                       onChange={e => set(field, parseInt(e.target.value))}
-                      min={5} max={60}
+                      min={5} max={1000}
                       style={{ flex: 1, accentColor: ACCENT }}
                     />
                     <NumberInput
                       value={config[field]}
                       onChange={v => set(field, v)}
-                      min={5} max={60}
+                      min={5} max={1000}
                     />
                   </div>
                 </div>
@@ -140,7 +140,7 @@ export function ConfigPanel({ onStart }: ConfigPanelProps) {
             <p style={{ margin: '0 0 14px', fontSize: 12, color: MUTED }}>How many moves before an organism reproduces</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
               {[
-                { key: 'planktonBreedingThreshold' as const, label: 'Plankton', emoji: '🌿' },
+                { key: 'planktonBreedingThreshold' as const, label: 'Plankton', emoji: '🦐' },
                 { key: 'sardineBreedingThreshold' as const, label: 'Sardine', emoji: '🐟' },
                 { key: 'sharkBreedingThreshold' as const, label: 'Shark', emoji: '🦈' },
               ].map(({ key, label, emoji }) => (

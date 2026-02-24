@@ -1,6 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { palette } from '../../styles/palette';
-import { PlanktonSvg, SardineSvg, SharkSvg, CrabSvg } from '../species';
 
 interface PopulationPieChartProps {
   plankton: number;
@@ -10,16 +9,16 @@ interface PopulationPieChartProps {
 }
 
 const SPECIES_CONFIG = [
-  { key: 'plankton', label: 'Plankton', color: palette.plankton, Icon: PlanktonSvg },
-  { key: 'sardine', label: 'Sardine', color: palette.sardine, Icon: SardineSvg },
-  { key: 'shark', label: 'Shark', color: palette.shark, Icon: SharkSvg },
-  { key: 'crab', label: 'Crab', color: palette.crab, Icon: CrabSvg },
+  { key: 'plankton', label: 'Plankton', color: palette.plankton, emoji: '🦐' },
+  { key: 'sardine', label: 'Sardine', color: palette.sardine, emoji: '🐟' },
+  { key: 'shark', label: 'Shark', color: palette.shark, emoji: '🦈' },
+  { key: 'crab', label: 'Crab', color: palette.crab, emoji: '🦀' },
 ] as const;
 
 function SpeciesLegend({ data }: { data: PopulationPieChartProps }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
-      {SPECIES_CONFIG.map(({ key, label, color, Icon }) => (
+      {SPECIES_CONFIG.map(({ key, label, color, emoji }) => (
         <div
           key={key}
           style={{
@@ -31,7 +30,7 @@ function SpeciesLegend({ data }: { data: PopulationPieChartProps }) {
           }}
           data-testid={`legend-${key}`}
         >
-          <Icon size={16} animated={false} />
+          <span style={{ fontSize: 16 }}>{emoji}</span>
           <span style={{ color: palette.textMuted }}>{label}:</span>
           <span style={{ fontWeight: 600, color }}>{data[key]}</span>
         </div>
@@ -51,7 +50,7 @@ export function PopulationPieChart({ plankton, sardine, shark, crab }: Populatio
 
   const getEmoji = (label: string) => {
     switch(label) {
-      case 'Plankton': return '🌿';
+      case 'Plankton': return '🦐';
       case 'Sardine': return '🐟';
       case 'Shark': return '🦈';
       case 'Crab': return '🦀';

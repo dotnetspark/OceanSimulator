@@ -7,18 +7,27 @@ using OceanSimulator.Infrastructure.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Aspire service defaults (telemetry, health checks, service discovery)
+builder.AddServiceDefaults();
+
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 
-// CORS for frontend
+// CORS for frontend - allow Aspire-orchestrated frontend and local dev
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+                "http://localhost:5173",      // Local Vite dev
+                "https://localhost:5173",     // Local Vite dev (HTTPS)
+                "http://frontend",            // Aspire service discovery
+                "https://frontend"            // Aspire service discovery (HTTPS)
+              )
+              .SetIsOriginAllowedToAllowWildcardSubdomains()
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -33,6 +42,9 @@ builder.Services.AddScoped<IOceanEventPublisher, SignalREventPublisher>();
 builder.Services.AddScoped<ISnapshotOrchestrator, SnapshotOrchestrator>();
 
 var app = builder.Build();
+
+// Map Aspire health check endpoints
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
