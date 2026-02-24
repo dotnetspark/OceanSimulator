@@ -103,3 +103,7 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 - **SignalR proxy note**: SignalR WebSocket connections to `/hubs/simulation` may need a separate proxy entry in `vite.config.ts` if they fail to connect — `/api` proxy only handles HTTP requests, WebSocket upgrades may require dedicated config
 - **TypeScript compliance**: All changes pass `tsc --noEmit` with strict mode enabled
 - **Key files**: `frontend/src/services/simulationApi.ts`, `frontend/src/hooks/useSignalR.ts`
+
+📌 Team update (2026-02-24T11-56-52.193Z): Merged four Aspire/Vite decisions from inbox. Kane fixed AppHost with AddNpmApp+WithReference. Parker configured vite.config.ts for service discovery proxy. Removed obsolete early Vite proxy decision (superseded by proper YARP+AddNpmApp+proxy architecture). Clear separation: YARP handles external traffic, AddNpmApp injects env vars, Vite proxy uses those vars for dev. Follow-up needed: update hardcoded localhost URLs in simulationApi.ts and useSignalR.ts to use relative paths. — decided by Kane, Parker
+
+

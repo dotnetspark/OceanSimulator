@@ -750,7 +750,6 @@ export function useGridDiff(currentGrid: OceanGrid | null): Map<string, CellChan
 - **Fix:** Use deterministic MockRandomProvider to assert exact counts
 
 
-
 # Decision: SVG Animation CSS Refactor
 
 **Date:** 2026-02-23  
@@ -808,7 +807,6 @@ Reduced each species to ≤5 SVG elements with bold, iconic shapes:
 - `frontend/src/components/species/*.tsx` (ALL modified)
 - `frontend/src/components/stats/PopulationGraph.tsx`
 - `frontend/src/components/stats/BirthDeathGraph.tsx`
-
 
 # Tailwind CSS Migration Complete
 
@@ -1113,4 +1111,173 @@ User requested moving simulation controls from the right stats panel to a fixed 
 
 - If mobile support needed, consider making footer sticky instead of fixed, or collapsible
 - Footer height is currently auto; could set explicit height if layout stability needed
+
+
+### Decision: Vite proxy as YARP equivalent for Aspire + Vite
+**By:** Yadel Lopez (via Kane)
+**What:** Use Vite's server.proxy to forward /api/* to the .NET backend. Only frontend port (5173) is externally exposed. API is internal-only in Aspire.
+**Why:** Single exposed endpoint, cleaner dev experience, hides backend service details. YARP would require an extra .NET gateway project; Vite proxy achieves the same effect natively.
+
+# Decision: Use AddNpmApp with WithReference for Aspire-Vite Integration
+
+**Date:** 2025-02  
+**Decider:** Kane (DevOps & Aspire Specialist)  
+**Status:** Implemented  
+**Commit:** `778442a`
+
+## Context
+
+The OceanSimulator AppHost needed to provide the frontend Vite process with the dynamically assigned API service URL so that Vite's proxy configuration could forward `/api` requests to the correct backend endpoint.
+
+## Decision
+
+Use `AddNpmApp()` with `.WithReference(api)` to inject the API service URL as environment variables into the Vite dev server process.
+
+### Implementation
+
+```csharp
+var api = builder.AddProject<Projects.OceanSimulator_Api>("api");
+
+var frontend = builder.AddNpmApp("frontend", "../../frontend", "dev")
+    .WithHttpEndpoint(port: 5173, env: "PORT")
+    .WithEnvironment("BROWSER", "none")
+    .WithReference(api)
+    .WaitFor(api);
+```
+
+### Key Mechanics
+
+1. **WithReference(api)** injects environment variables into the frontend process:
+   - `services__api__http__0` — HTTP URL of the API service
+   - `services__api__https__0` — HTTPS URL of the API service
+   - Naming pattern: `services__{serviceName}__{scheme}__{index}`
+
+2. **WithEnvironment("BROWSER", "none")** prevents Vite from auto-opening a browser
+
+3. **WithHttpEndpoint(port: 5173, env: "PORT")** ensures Vite uses the correct port
+
+4. **WaitFor(api)** ensures the API starts before the frontend
+
+### Why Not AddViteApp?
+
+The `AddViteApp` extension method doesn't exist in Aspire 9.3.0. `AddNpmApp` is the correct method for integrating any npm-based project, including Vite.
+
+## Consequences
+
+### Positive
+- Frontend Vite process receives correct API URL at runtime
+- Works with dynamic port assignment
+- Vite config can use `import.meta.env.services__api__http__0` to proxy requests
+- Proper Aspire service reference pattern
+- No hardcoded URLs
+
+### Negative
+- None identified
+
+## Alternatives Considered
+
+1. **AddViteApp** — Doesn't exist in current Aspire version
+2. **Hardcode URL in Vite config** — Fails with dynamic port assignment
+3. **Manual environment variable injection** — Less maintainable than WithReference
+
+## Related
+
+- Commit: `778442a` - "fix(aspire): add WithReference to inject API URL into Vite process"
+- Issue #28 closed (unrelated theme work completed in PR #27)
+
+### Decision: Use Aspire YARP proxy as single external endpoint
+
+**By:** Yadel Lopez (executed by Kane)  
+**Date:** 2025-02-24  
+**Branch:** `feature/aspire-orchestration`  
+**Commit:** `1305048`
+
+**What:**  
+Replaced Vite `server.proxy` with `Aspire.Hosting.Yarp` (v9.5.2-preview) as the single external endpoint for the application. YARP proxy routes `/api/{**catch-all}` to the API and all other traffic to the frontend. API and Vite dev server are now internal-only resources.
+
+**Why:**  
+- **Production-ready:** YARP is Microsoft's production reverse proxy (used in Azure, high-performance)
+- **Consistent behavior:** Works identically in dev and publish modes (Vite proxy only works in dev)
+- **Proper gateway pattern:** Single entry point for microservices architecture
+- **Advanced features:** Supports load balancing, transforms, circuit breakers, health checks
+- **Cleaner separation:** Frontend doesn't need to know about backend routing
+
+**Implementation:**
+```csharp
+var proxy = builder.AddYarp("oceanproxy")
+    .WithExternalHttpEndpoints()
+    .WithConfiguration(yarp =>
+    {
+        yarp.AddRoute("/api/{**catch-all}", api);  // API routes
+        yarp.AddRoute(frontend);                    // Catch-all for frontend
+    });
+```
+
+**Trade-offs:**
+- **Pro:** Production-ready, feature-rich, consistent dev/prod behavior
+- **Pro:** Single port exposed (simpler firewall/networking)
+- **Pro:** YARP can serve static files in publish mode (future enhancement)
+- **Con:** Adds dependency on preview package (9.5.2-preview)
+- **Con:** Slightly more complex than Vite proxy for dev-only scenarios
+
+**Alternatives Considered:**
+1. **Keep Vite proxy:** Simpler but dev-only, not production-ready
+2. **Custom gateway project:** More control but requires maintaining custom code
+3. **Frontend as direct endpoint:** Simpler but requires CORS configuration and doesn't scale to multiple services
+
+**Decision:** Use YARP for better production readiness and alignment with Aspire best practices.
+
+# Decision: Aspire Service Discovery Proxy for Frontend API Calls
+
+**Status:** Proposed  
+**Date:** 2026-02-24  
+**Author:** Parker (Frontend Dev)
+
+## Context
+
+Aspire orchestration injects service discovery environment variables into the Vite dev server when using `.AddViteApp().WithReference(api)`. The frontend needs to proxy API calls to the correct backend URL without hardcoding localhost URLs.
+
+## Decision
+
+Configure Vite proxy to read Aspire service discovery env vars:
+- Primary: `services__api__https__0` (HTTPS endpoint)
+- Fallback: `services__api__http__0` (HTTP endpoint)
+- Format: lowercase service name, double underscores, protocol, index
+
+Proxy config in `vite.config.ts`:
+```typescript
+const apiTarget = process.env['services__api__https__0'] ||
+                  process.env['services__api__http__0'];
+
+server: {
+  host: true,  // Bind to all interfaces for Aspire port forwarding
+  proxy: apiTarget ? {
+    '/api': { target: apiTarget, changeOrigin: true, secure: false }
+  } : undefined
+}
+```
+
+## Consequences
+
+### Positive
+- Works seamlessly under Aspire orchestration (API URL auto-discovered)
+- Gracefully degrades when running standalone (proxy disabled)
+- No hardcoded localhost URLs in Vite config
+- `host: true` enables Aspire port forwarding from other machines
+
+### Negative
+- **Follow-up required**: Frontend source code still has hardcoded `VITE_API_URL ?? 'http://localhost:5030'` in `simulationApi.ts` and different port (`5000`) in `useSignalR.ts`
+- These should be updated to use relative paths (`/api`, `/hubs/simulation`) to leverage the proxy
+- Without this follow-up, the proxy config won't be used by frontend code
+
+## Alternatives Considered
+
+1. **Use `VITE_API_URL` env var**: Aspire would need to inject this explicitly; less discoverable than using Aspire's native service discovery format
+2. **Hardcode `http://localhost:5000`**: Breaks when running under Aspire with dynamic ports
+
+## Related Work
+
+- Commit: `fix(frontend): add Aspire service discovery proxy in vite.config` (11a3ced)
+- Next: Update `simulationApi.ts` and `useSignalR.ts` to use relative paths
+
 

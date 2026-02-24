@@ -153,4 +153,42 @@ var proxy = builder.AddYarp("oceanproxy")
 
 **Commit:** `1305048` - "feat: replace Vite proxy with Aspire YARP reverse proxy (single external endpoint)"
 
+### 2025-02 — Aspire WithReference Pattern for Service URL Injection
+
+**Task:** Fix AppHost.cs to use `WithReference(api)` to inject API service URL as environment variables into the Vite frontend process.
+
+**Key Pattern:**
+```csharp
+var frontend = builder.AddNpmApp("frontend", "../../frontend", "dev")
+    .WithHttpEndpoint(port: 5173, env: "PORT")
+    .WithEnvironment("BROWSER", "none")
+    .WithReference(api)
+    .WaitFor(api);
+```
+
+**What WithReference Does:**
+- Injects service URL environment variables into the dependent process
+- For a service named `"api"`, Aspire injects: `services__api__http__0` and `services__api__https__0`
+- Environment variable naming pattern: `services__{serviceName}__{scheme}__{index}`
+- These env vars contain the runtime URL of the referenced service (e.g., `http://localhost:5001`)
+- Enables Vite config to dynamically proxy `/api` calls to the correct running API URL
+
+**Other Environment Variables:**
+- `BROWSER=none` — Prevents Vite from auto-opening browser on startup
+- `PORT` — Set via `WithHttpEndpoint(port: 5173, env: "PORT")` to control Vite's dev server port
+
+**Why Not AddViteApp:**
+- `AddViteApp` extension method doesn't exist in current Aspire version (9.3.0)
+- `AddNpmApp` is the correct method for npm-based projects (including Vite)
+- `WithReference` works with any resource type (npm, project, container, etc.)
+
+**Closed Issue #28:**
+- Issue was for white/light theme migration
+- Work was completed and merged in PR #27
+- Closed with explanation via GitHub CLI
+
+**Commit:** `778442a` - "fix(aspire): add WithReference to inject API URL into Vite process"
+
+📌 Team update (2026-02-24T11-56-52.193Z): Merged four Aspire/Vite decisions from inbox. Removed obsolete "Vite proxy as YARP equivalent" decision (superseded by proper YARP decision). Now have clear architecture: YARP as single external endpoint, AddNpmApp+WithReference for service discovery injection, Vite proxy for dev convenience, Parker working on frontend hardcoded URL cleanup. — decided by Kane, Parker
+
 
