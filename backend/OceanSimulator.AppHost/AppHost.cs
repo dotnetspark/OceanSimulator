@@ -3,9 +3,11 @@ var builder = DistributedApplication.CreateBuilder(args);
 // Add the backend API project (internal only)
 var api = builder.AddProject<Projects.OceanSimulator_Api>("api");
 
-// Add the Vite frontend with npm integration (internal only)
+// Add the Vite frontend with proper Aspire integration (internal only)
 var frontend = builder.AddNpmApp("frontend", "../../frontend", "dev")
     .WithHttpEndpoint(port: 5173, env: "PORT")
+    .WithEnvironment("BROWSER", "none")
+    .WithReference(api)
     .WaitFor(api);
 
 // Add YARP reverse proxy as the single external endpoint
