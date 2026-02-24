@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OceanSimulator.Application\OceanSimulator.Application.csproj" />
     <ProjectReference Include="..\OceanSimulator.Infrastructure\OceanSimulator.Infrastructure.csproj" />
+    <ProjectReference Include="..\OceanSimulator.ServiceDefaults\OceanSimulator.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

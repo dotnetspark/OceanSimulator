@@ -61,17 +61,33 @@ graph LR
 - Node.js 20+
 - (Optional) Visual Studio 2022 or VS Code
 
-### Backend
+### Quick Start with .NET Aspire (Recommended)
+
+The easiest way to run the full stack locally:
+
+```bash
+cd backend
+dotnet run --project OceanSimulator.AppHost
+```
+
+This launches the **Aspire Dashboard** at `http://localhost:15299` (or similar), which orchestrates:
+- Backend API (with auto-assigned port and service discovery)
+- Vite frontend dev server (port 5173)
+- Telemetry, logs, and health checks in one unified dashboard
+
+### Run Projects Individually (Alternative)
+
+#### Backend
 
 ```bash
 cd backend
 dotnet restore
 dotnet run --project OceanSimulator.Api
-# API available at http://localhost:5000
-# Swagger UI at http://localhost:5000/swagger
+# API available at http://localhost:5030
+# Swagger UI at http://localhost:5030/swagger
 ```
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
@@ -81,7 +97,7 @@ npm run dev
 # App at http://localhost:5173
 ```
 
-### Run Both
+#### Run Both (Manual Method)
 
 ```bash
 # Terminal 1 — backend
