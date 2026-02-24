@@ -4,6 +4,7 @@ using OceanSimulator.Api.Services;
 using OceanSimulator.Application.DTOs;
 using OceanSimulator.Domain.Enums;
 using OceanSimulator.Domain.Interfaces;
+using OceanSimulator.Domain.ValueObjects;
 
 namespace OceanSimulator.Api.Controllers;
 
@@ -25,6 +26,29 @@ public class SimulationController : ControllerBase
         _repository = repository;
     }
     
+    private object BuildGridResponse(IOcean ocean)
+    {
+        var cells = new List<List<object>>();
+        for (int r = 0; r < ocean.Rows; r++)
+        {
+            var row = new List<object>();
+            for (int c = 0; c < ocean.Cols; c++)
+            {
+                var pos = new Position(r, c);
+                var specimen = ocean.GetSpecimenAt(pos);
+                var specimenType = specimen?.Type ?? SpecimenType.Water;
+                row.Add(new
+                {
+                    position = new { row = r, col = c },
+                    specimenType = specimenType.ToString(),
+                    specimenId = specimen?.Id.ToString()
+                });
+            }
+            cells.Add(row);
+        }
+        return new { rows = ocean.Rows, cols = ocean.Cols, cells };
+    }
+    
     [HttpPost("initialize")]
     public IActionResult Initialize([FromBody] SimulationConfigDto configDto)
     {
@@ -44,8 +68,9 @@ public class SimulationController : ControllerBase
             configDto.Seed);
             
         _simulationService.Initialize(config);
+        var grid = BuildGridResponse(_simulationService.Ocean!);
         
-        return Ok(new { message = "Simulation initialized", rows = config.Rows, cols = config.Cols });
+        return Ok(grid);
     }
     
     [HttpPost("snapshot")]
@@ -55,7 +80,25 @@ public class SimulationController : ControllerBase
             return BadRequest("Simulation not initialized");
             
         var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!);
-        return Ok(result);
+        var grid = BuildGridResponse(_simulationService.Ocean!);
+        
+        return Ok(new
+        {
+            snapshotNumber = result.SnapshotNumber,
+            populationCounts = new
+            {
+                plankton = result.PopulationCounts.GetValueOrDefault(SpecimenType.Plankton, 0),
+                sardine = result.PopulationCounts.GetValueOrDefault(SpecimenType.Sardine, 0),
+                shark = result.PopulationCounts.GetValueOrDefault(SpecimenType.Shark, 0),
+                crab = result.PopulationCounts.GetValueOrDefault(SpecimenType.Crab, 0),
+                deadSardine = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadSardine, 0),
+                deadShark = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadShark, 0)
+            },
+            totalBirths = result.TotalBirths,
+            totalDeaths = result.TotalDeaths,
+            isExtinctionReached = result.IsExtinctionReached,
+            grid
+        });
     }
     
     [HttpPost("snapshots/{n}")]
@@ -103,21 +146,22 @@ public class SimulationController : ControllerBase
     }
     
     [HttpPost("save")]
-    public async Task<IActionResult> Save([FromBody] string filePath)
+    public IActionResult Save()
     {
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
             
-        await _repository.SaveAsync(_simulationService.Ocean!, filePath);
-        return Ok(new { message = "Simulation saved", filePath });
+        var grid = BuildGridResponse(_simulationService.Ocean!);
+        var json = System.Text.Json.JsonSerializer.Serialize(grid);
+        return File(System.Text.Encoding.UTF8.GetBytes(json), "application/json", "ocean-state.json");
     }
     
     [HttpPost("load")]
-    public async Task<IActionResult> Load([FromBody] string filePath)
+    public IActionResult Load(IFormFile file)
     {
-        var ocean = await _repository.LoadAsync(filePath);
-        _simulationService.SetOcean(ocean);
-        return Ok(new { message = "Simulation loaded", filePath });
+        // TODO: Implement load from uploaded file when IOceanRepository supports stream-based loading
+        // Currently LoadAsync only accepts string filePath, not a stream
+        return BadRequest("Load from file upload not yet implemented - repository needs stream support");
     }
     
     [HttpPost("run/extinction")]
@@ -126,14 +170,33 @@ public class SimulationController : ControllerBase
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
             
-        var results = new List<object>();
         int maxIterations = 10000;
         int iteration = 0;
+        object? lastResult = null;
         
         while (iteration < maxIterations)
         {
             var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!);
-            results.Add(result);
+            var grid = BuildGridResponse(_simulationService.Ocean!);
+            
+            lastResult = new
+            {
+                snapshotNumber = result.SnapshotNumber,
+                populationCounts = new
+                {
+                    plankton = result.PopulationCounts.GetValueOrDefault(SpecimenType.Plankton, 0),
+                    sardine = result.PopulationCounts.GetValueOrDefault(SpecimenType.Sardine, 0),
+                    shark = result.PopulationCounts.GetValueOrDefault(SpecimenType.Shark, 0),
+                    crab = result.PopulationCounts.GetValueOrDefault(SpecimenType.Crab, 0),
+                    deadSardine = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadSardine, 0),
+                    deadShark = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadShark, 0)
+                },
+                totalBirths = result.TotalBirths,
+                totalDeaths = result.TotalDeaths,
+                isExtinctionReached = result.IsExtinctionReached,
+                grid
+            };
+            
             iteration++;
             
             if (request.Target.ToLower() == "sardine")
@@ -148,7 +211,7 @@ public class SimulationController : ControllerBase
             }
         }
         
-        return Ok(new { iterations = iteration, results });
+        return Ok(lastResult);
     }
     
     [HttpPost("run/event")]
