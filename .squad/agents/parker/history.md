@@ -87,3 +87,19 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 - **TypeScript compliance**: Zero errors with strict mode + verbatimModuleSyntax
 
 📌 Team update (2026-02-23T21-30-00Z): Lambert redesigned StatsPanel as floating glass overlay; Bishop replaced charts with ecosystem metrics (Ecosystem Balance, Population Pulse); Ripley added Mermaid architecture diagrams — coordinated footer layout with Lambert, confirmed charts fit within panel, charts use existing palette colors. — decided by Lambert, Bishop, Ripley
+
+### 2026-02-24: Aspire Service Discovery Proxy Configuration
+- **Aspire env var format**: When AppHost uses `.AddViteApp().WithReference(api)`, Aspire injects service discovery env vars in the format: `services__api__https__0` and `services__api__http__0` (lowercase, double underscores)
+- **Vite proxy setup**: Updated `vite.config.ts` to read `services__api__https__0` (prefer HTTPS) or fallback to `services__api__http__0`; proxy only activates when `apiTarget` is set (i.e., running under Aspire)
+- **Host binding**: Added `host: true` to Vite server config for Aspire port forwarding compatibility (binds to all interfaces, not just localhost)
+- **Standalone dev**: When running Vite standalone (no Aspire), `apiTarget` is undefined → proxy is disabled → frontend dev server works but API calls will fail until backend is running separately
+- **Hardcoded API URLs found**: `frontend/src/services/simulationApi.ts` uses `VITE_API_URL ?? 'http://localhost:5030'`; `frontend/src/hooks/useSignalR.ts` uses `VITE_API_URL ?? 'http://localhost:5000'` (different port!); these need updating to use relative paths (`/api`) to leverage the proxy
+- **Key file**: `frontend/vite.config.ts`
+
+### 2026-02-24: Relative API Paths Migration
+- **API base URL**: Changed `simulationApi.ts` from hardcoded `http://localhost:5030` to empty string `''` (relative paths) — now uses `/api/...` paths through Vite proxy and YARP
+- **SignalR hub URL**: Changed `useSignalR.ts` from hardcoded `http://localhost:5000/hubs/simulation` to `/hubs/simulation` (relative path)
+- **Proxy compatibility**: Both files now respect `VITE_API_URL` env var if set, otherwise default to relative paths that work through Aspire's Vite proxy (dev) and YARP (production)
+- **SignalR proxy note**: SignalR WebSocket connections to `/hubs/simulation` may need a separate proxy entry in `vite.config.ts` if they fail to connect — `/api` proxy only handles HTTP requests, WebSocket upgrades may require dedicated config
+- **TypeScript compliance**: All changes pass `tsc --noEmit` with strict mode enabled
+- **Key files**: `frontend/src/services/simulationApi.ts`, `frontend/src/hooks/useSignalR.ts`
