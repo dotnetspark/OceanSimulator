@@ -7,7 +7,7 @@ namespace OceanSimulator.Domain.Entities;
 public class Ocean : IOcean
 {
     private readonly Dictionary<Position, ISpecimen> _grid = new();
-    private readonly List<ISpecimen> _specimens = new();
+    private readonly HashSet<ISpecimen> _specimens = new();
     
     public int Rows { get; }
     public int Cols { get; }

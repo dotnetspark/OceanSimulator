@@ -123,12 +123,11 @@ public class SnapshotOrchestrator : ISnapshotOrchestrator
     {
         var counts = new Dictionary<SpecimenType, int>();
         foreach (SpecimenType type in Enum.GetValues<SpecimenType>())
-        {
-            if (type != SpecimenType.Water)
-            {
-                counts[type] = ocean.GetSpecimenCount(type);
-            }
-        }
+            if (type != SpecimenType.Water) counts[type] = 0;
+
+        foreach (var s in ocean.GetAllSpecimens())
+            if (s.Type != SpecimenType.Water) counts[s.Type] = counts.GetValueOrDefault(s.Type) + 1;
+
         return counts;
     }
 }
