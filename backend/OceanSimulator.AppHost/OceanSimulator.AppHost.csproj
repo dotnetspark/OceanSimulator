@@ -1,13 +1,13 @@
-<Project Sdk="Aspire.AppHost.Sdk/9.3.0">
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
 
   <ItemGroup>
     <ProjectReference Include="..\OceanSimulator.Api\OceanSimulator.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
-    <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.3.0" />
-    <PackageReference Include="Aspire.Hosting.Yarp" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
+    <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
+    <PackageReference Include="Aspire.Hosting.Yarp" Version="13.0.2" />
   </ItemGroup>
 
   <PropertyGroup>
