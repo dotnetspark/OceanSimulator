@@ -215,11 +215,59 @@ public class SimulationController : ControllerBase
     }
     
     [HttpPost("run/event")]
-    public async Task<IActionResult> RunUntilEvent([FromBody] string eventType)
+    public async Task<IActionResult> RunUntilEvent()
     {
         if (!_simulationService.IsInitialized)
             return BadRequest("Simulation not initialized");
-            
-        return Ok(new { message = "RunUntilEvent not yet implemented" });
+
+        int maxIterations = 10000;
+
+        for (int i = 0; i < maxIterations; i++)
+        {
+            var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!);
+            var grid = BuildGridResponse(_simulationService.Ocean!);
+
+            if (result.TotalBirths > 0 || result.TotalDeaths > 0 || result.IsExtinctionReached)
+            {
+                return Ok(new
+                {
+                    snapshotNumber = result.SnapshotNumber,
+                    populationCounts = new
+                    {
+                        plankton    = result.PopulationCounts.GetValueOrDefault(SpecimenType.Plankton, 0),
+                        sardine     = result.PopulationCounts.GetValueOrDefault(SpecimenType.Sardine, 0),
+                        shark       = result.PopulationCounts.GetValueOrDefault(SpecimenType.Shark, 0),
+                        crab        = result.PopulationCounts.GetValueOrDefault(SpecimenType.Crab, 0),
+                        deadSardine = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadSardine, 0),
+                        deadShark   = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadShark, 0)
+                    },
+                    totalBirths         = result.TotalBirths,
+                    totalDeaths         = result.TotalDeaths,
+                    isExtinctionReached = result.IsExtinctionReached,
+                    grid
+                });
+            }
+        }
+
+        // No event found in maxIterations — return the last state anyway
+        var lastGrid = BuildGridResponse(_simulationService.Ocean!);
+        var ocean = _simulationService.Ocean!;
+        return Ok(new
+        {
+            snapshotNumber = maxIterations,
+            populationCounts = new
+            {
+                plankton    = ocean.GetSpecimenCount(SpecimenType.Plankton),
+                sardine     = ocean.GetSpecimenCount(SpecimenType.Sardine),
+                shark       = ocean.GetSpecimenCount(SpecimenType.Shark),
+                crab        = ocean.GetSpecimenCount(SpecimenType.Crab),
+                deadSardine = ocean.GetSpecimenCount(SpecimenType.DeadSardine),
+                deadShark   = ocean.GetSpecimenCount(SpecimenType.DeadShark)
+            },
+            totalBirths         = 0,
+            totalDeaths         = 0,
+            isExtinctionReached = false,
+            grid = lastGrid
+        });
     }
 }
