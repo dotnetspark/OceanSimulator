@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
     <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.3.0" />
+    <PackageReference Include="Aspire.Hosting.Yarp" Version="9.5.2-preview.1.25522.3" />
   </ItemGroup>
 
   <PropertyGroup>
