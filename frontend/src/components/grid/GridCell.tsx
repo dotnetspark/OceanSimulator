@@ -9,7 +9,7 @@ interface GridCellProps {
 }
 
 const EmojiMap: Partial<Record<string, string>> = {
-  Plankton:    '🌿',
+  Plankton:    '🦐',
   Sardine:     '🐟',
   Shark:       '🦈',
   Crab:        '🦀',
@@ -34,7 +34,7 @@ export const GridCell = React.memo(({ cell, size, animState }: GridCellProps) =>
     <div
       data-testid={`cell-${cell.position.row}-${cell.position.col}`}
       data-anim={animState}
-      className="flex items-center justify-center bg-[#0d1b2a] border border-[rgba(255,255,255,0.04)]"
+      className="flex items-center justify-center bg-[#b8d8e8]"
       style={{ width: size, height: size }}
     >
       {emoji && (

@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 
-const PANEL_BG = '#0f1f3d';
-const BORDER = '#1e4060';
+const PANEL_BG = '#ffffff';
+const BORDER = '#d0dde8';
 const ACCENT = '#00b4d8';
-const MUTED = '#7a9bb5';
+const MUTED = '#5a7a96';
 
 interface SimulationControlsProps {
   isRunning: boolean;
@@ -39,10 +39,10 @@ function Btn({
       data-testid={testId}
       style={{
         padding: '8px 14px',
-        background: disabled ? '#1a2a3a' : bg,
+        background: disabled ? '#edf0f5' : bg,
         border: `1px solid ${disabled ? BORDER : variant === 'ghost' ? BORDER : 'transparent'}`,
         borderRadius: 7,
-        color: disabled ? '#3a5570' : '#e8f4f8',
+        color: disabled ? '#a0b4c4' : variant === 'ghost' ? '#0a1628' : '#ffffff',
         fontSize: 13,
         fontWeight: 500,
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -69,7 +69,7 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
 
 const SPECIES_OPTIONS: { value: string; label: string }[] = [
   { value: 'all',      label: 'Any Species'  },
-  { value: 'plankton', label: '🌿 Plankton'  },
+  { value: 'plankton', label: '🦐 Plankton'  },
   { value: 'sardine',  label: '🐟 Sardine'   },
   { value: 'shark',    label: '🦈 Shark'     },
   { value: 'crab',     label: '🦀 Crab'      },
@@ -90,7 +90,7 @@ export function SimulationControls({
   // Footer variant — horizontal layout
   if (variant === 'footer') {
     return (
-      <div className="px-6 py-4 flex flex-row gap-4 items-center flex-wrap">
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center', padding: '8px 16px', width: '100%', overflowX: 'auto', alignSelf: 'center' } as React.CSSProperties}>
         {/* Running indicator */}
         {isRunning && (
           <div className="flex items-center gap-2 py-2 px-3 bg-[rgba(0,180,216,0.1)] rounded-[7px] border border-[rgba(0,180,216,0.3)]">
@@ -112,7 +112,7 @@ export function SimulationControls({
             disabled={isRunning}
             min={1} max={9999}
             data-testid="input-n"
-            style={{ width: 52, padding: '7px 8px', background: '#0a1628', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#e8f4f8', fontSize: 13, textAlign: 'center' }}
+            style={{ width: 52, padding: '7px 8px', background: '#ffffff', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#0a1628', fontSize: 13, textAlign: 'center' }}
           />
           <Btn onClick={() => onRunN(nValue)} disabled={isRunning} variant="primary" testId="btn-run-n">
             ▶▶ Run N
@@ -129,7 +129,7 @@ export function SimulationControls({
             value={extinctionTarget}
             onChange={e => setExtinctionTarget(e.target.value)}
             disabled={isRunning}
-            style={{ padding: '7px 10px', background: '#0a1628', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#e8f4f8', fontSize: 13 }}
+            style={{ padding: '7px 10px', background: '#ffffff', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#0a1628', fontSize: 13 }}
           >
             {SPECIES_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -145,7 +145,7 @@ export function SimulationControls({
 
   // Sidebar variant — vertical layout (default)
   return (
-    <div className="px-4 pt-4 pb-3 flex flex-col gap-3.5 border-t border-[rgba(0,180,216,0.15)]">
+    <div className="px-4 pt-4 pb-3 flex flex-col gap-3.5 border-t border-[#d0dde8]">
       {/* Running indicator */}
       {isRunning && (
         <div className="flex items-center gap-2 py-2 px-3 bg-[rgba(0,180,216,0.1)] rounded-[7px] border border-[rgba(0,180,216,0.3)]">
@@ -170,7 +170,7 @@ export function SimulationControls({
               disabled={isRunning}
               min={1} max={9999}
               data-testid="input-n"
-              style={{ width: 52, padding: '7px 8px', background: '#0a1628', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#e8f4f8', fontSize: 13, textAlign: 'center' }}
+              style={{ width: 52, padding: '7px 8px', background: '#ffffff', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#0a1628', fontSize: 13, textAlign: 'center' }}
             />
             <Btn onClick={() => onRunN(nValue)} disabled={isRunning} variant="primary" testId="btn-run-n">
               ▶▶ Run N
@@ -191,7 +191,7 @@ export function SimulationControls({
               value={extinctionTarget}
               onChange={e => setExtinctionTarget(e.target.value)}
               disabled={isRunning}
-              style={{ padding: '7px 10px', background: '#0a1628', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#e8f4f8', fontSize: 13, flex: '1 1 auto', minWidth: 0 }}
+              style={{ padding: '7px 10px', background: '#ffffff', border: `1px solid ${BORDER}`, borderRadius: 6, color: '#0a1628', fontSize: 13, flex: '1 1 auto', minWidth: 0 }}
             >
               {SPECIES_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>

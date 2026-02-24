@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PopulationGraph } from './PopulationGraph';
 import { BirthDeathGraph } from './BirthDeathGraph';
 import { PopulationPieChart } from './PopulationPieChart';
+import { PlanktonSvg } from '../species/PlanktonSvg';
+import { SardineSvg } from '../species/SardineSvg';
+import { SharkSvg } from '../species/SharkSvg';
+import { CrabSvg } from '../species/CrabSvg';
 import type { SimulationState } from '../../types/simulation.types';
 
 interface StatsPanelProps {
@@ -9,110 +13,106 @@ interface StatsPanelProps {
 }
 
 const SPECIES_BADGES = [
-  { key: 'plankton', emoji: '🌿', color: '#2ecc71' },
-  { key: 'sardine', emoji: '🐟', color: '#3498db' },
-  { key: 'shark', emoji: '🦈', color: '#9b59b6' },
-  { key: 'crab', emoji: '🦀', color: '#e67e22' },
+  { key: 'plankton', Icon: PlanktonSvg, color: '#7ec8a0' },
+  { key: 'sardine',  Icon: SardineSvg,  color: '#89b4d8' },
+  { key: 'shark',    Icon: SharkSvg,    color: '#8899aa' },
+  { key: 'crab',     Icon: CrabSvg,     color: '#e07b39' },
 ] as const;
 
+const INIT_RIGHT = 16;
+const INIT_TOP = 80;
+
 export function StatsPanel({ state }: StatsPanelProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [pos, setPos] = useState({ right: INIT_RIGHT, top: INIT_TOP });
+  const dragState = useRef<{ startX: number; startY: number; origRight: number; origTop: number } | null>(null);
   const latestCounts = state.populationHistory[state.populationHistory.length - 1];
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!dragState.current) return;
+      const dx = e.clientX - dragState.current.startX;
+      const dy = e.clientY - dragState.current.startY;
+      setPos({
+        right: Math.max(0, dragState.current.origRight - dx),
+        top: Math.max(64, dragState.current.origTop + dy),
+      });
+    };
+    const onUp = () => { dragState.current = null; };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+  }, []);
+
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dragState.current = { startX: e.clientX, startY: e.clientY, origRight: pos.right, origTop: pos.top };
+  };
+
+  const panelHeight = `calc(100vh - ${pos.top}px - 72px)`;
 
   return (
     <div
-      className="absolute right-4 top-4 w-[320px] z-10"
-      style={{
-        transform: isOpen ? 'translateX(0)' : 'translateX(calc(100% + 40px))',
-        opacity: isOpen ? 1 : 0,
-        transition: 'transform 0.25s ease, opacity 0.25s ease',
-        maxHeight: 'calc(100vh - 140px)',
-      }}
       data-testid="stats-panel"
+      style={{
+        position: 'fixed',
+        right: pos.right,
+        top: pos.top,
+        width: 320,
+        height: panelHeight,
+        zIndex: 40,
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: 14,
+        background: 'rgba(255,255,255,0.97)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(0,180,216,0.25)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,180,216,0.1)',
+        overflow: 'hidden',
+      }}
     >
-      {/* Collapse/expand toggle tab */}
-      <button
-        onClick={() => setIsOpen(o => !o)}
-        className="absolute flex items-center justify-center cursor-pointer border border-[rgba(0,180,216,0.3)] text-[#00b4d8] text-xs font-medium tracking-wide"
-        style={{
-          left: '-36px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '32px',
-          height: '80px',
-          borderRadius: '8px 0 0 8px',
-          background: 'rgba(10, 22, 40, 0.92)',
-          backdropFilter: 'blur(12px)',
-          writingMode: 'vertical-rl',
-          textOrientation: 'mixed',
-        }}
-        aria-label={isOpen ? 'Collapse stats panel' : 'Expand stats panel'}
-        data-testid="stats-toggle"
-      >
-        {isOpen ? '❮ Stats' : '📊'}
-      </button>
-
-      {/* Glass panel container */}
+      {/* Drag handle */}
       <div
-        className="rounded-[14px] overflow-hidden"
+        onMouseDown={handleDragStart}
         style={{
-          background: 'rgba(10, 22, 40, 0.88)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(0, 180, 216, 0.3)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,180,216,0.1)',
-          maxHeight: 'calc(100vh - 140px)',
-          overflowY: 'auto',
+          flexShrink: 0,
+          height: 28,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'grab',
+          borderBottom: '1px solid rgba(0,180,216,0.15)',
+          background: 'rgba(0,180,216,0.06)',
+          userSelect: 'none',
         }}
       >
-        <div className="p-4 flex flex-col gap-4">
-          {/* Species count badges — 2x2 grid */}
-          {latestCounts && (
-            <div className="grid grid-cols-2 gap-2">
-              {SPECIES_BADGES.map(({ key, emoji, color }) => (
-                <div
-                  key={key}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    color,
-                  }}
-                >
-                  <span className="text-base">{emoji}</span>
-                  <span>{latestCounts[key]}</span>
-                </div>
-              ))}
-            </div>
-          )}
+        <div style={{ width: 32, height: 4, borderRadius: 2, background: 'rgba(0,180,216,0.4)' }} />
+      </div>
 
-          {/* Section header */}
-          <div
-            className="text-[10px] font-semibold uppercase tracking-widest pt-2"
-            style={{ color: 'rgba(0,180,216,0.7)' }}
-          >
-            Population
+      {/* Scrollable content */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Section header */}
+        <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0096c7', paddingTop: 4 }}>
+          Population
+        </div>
+
+        {latestCounts && (
+          <PopulationPieChart
+            plankton={latestCounts.plankton}
+            sardine={latestCounts.sardine}
+            shark={latestCounts.shark}
+            crab={latestCounts.crab}
+          />
+        )}
+
+        <div style={{ borderTop: '1px solid rgba(0,180,216,0.15)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0096c7' }}>
+            Trends
           </div>
-
-          {/* Population pie chart */}
-          {latestCounts && (
-            <PopulationPieChart
-              plankton={latestCounts.plankton}
-              sardine={latestCounts.sardine}
-              shark={latestCounts.shark}
-              crab={latestCounts.crab}
-            />
-          )}
-
-          {/* Divider + Graphs */}
-          <div className="border-t border-white/[0.05] pt-3 flex flex-col gap-3">
-            <div
-              className="text-[10px] font-semibold uppercase tracking-widest"
-              style={{ color: 'rgba(0,180,216,0.7)' }}
-            >
-              Trends
-            </div>
-            <PopulationGraph data={state.populationHistory} />
-            <BirthDeathGraph birthsData={state.birthsHistory} deathsData={state.deathsHistory} />
-          </div>
+          <PopulationGraph data={state.populationHistory} />
+          <BirthDeathGraph birthsData={state.birthsHistory} deathsData={state.deathsHistory} />
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useSimulation } from './hooks/useSimulation';
 import { useGridDiff } from './hooks/useGridDiff';
 import { ConfigPanel } from './components/controls/ConfigPanel';
-
+import { SimulationControls } from './components/controls/SimulationControls';
 import { OceanGrid } from './components/grid/OceanGrid';
 import { StatsPanel } from './components/stats/StatsPanel';
 import type { SimulationConfig } from './types/simulation.types';
@@ -20,12 +20,18 @@ function App() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const hamburgerBtnRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 70, right: 16 });
   const loadFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
     const handle = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        (!dropdownRef.current || !dropdownRef.current.contains(e.target as Node))
+      ) {
         setMenuOpen(false);
       }
     };
@@ -62,13 +68,13 @@ function App() {
 
 
   return (
-    <div className="min-h-screen bg-[#0a1628] text-[#e8f4f8] font-[system-ui,sans-serif]">
+    <div className="h-screen bg-[#f5f8fc] text-[#0a1628] font-[system-ui,sans-serif] flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between h-16 px-6 border-b border-[rgba(0,180,216,0.2)] bg-[#0f1f3d] relative z-10">
-        <span className="text-2xl font-bold text-[#00b4d8] tracking-[-0.5px]">
+      <header className="shrink-0 flex items-center justify-between h-16 px-6 border-b border-[rgba(0,180,216,0.2)] bg-[#0f1f3d] relative z-30 overflow-visible">
+        <span className="shrink-0 whitespace-nowrap text-2xl font-bold text-[#00b4d8] tracking-[-0.5px]">
           🌊 Ocean Simulator
         </span>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-8 ml-4">
           {started && (
             <span className="text-sm text-[#7a9bb5]">
               Snapshot <span className="text-[#00b4d8] font-semibold">#{sim.state.snapshotNumber}</span>
@@ -77,14 +83,35 @@ function App() {
           {started && (
             <div ref={menuRef} className="relative">
               <button
-                onClick={() => setMenuOpen(o => !o)}
+                ref={hamburgerBtnRef}
+                onClick={() => {
+                  if (!menuOpen && hamburgerBtnRef.current) {
+                    const rect = hamburgerBtnRef.current.getBoundingClientRect();
+                    setDropdownPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+                  }
+                  setMenuOpen(o => !o);
+                }}
                 aria-label="Open menu"
                 className="bg-transparent border border-[rgba(0,180,216,0.2)] rounded-md text-[#e8f4f8] cursor-pointer px-4 py-2.5 text-xl leading-none min-w-[40px] min-h-[40px]"
               >
                 ☰
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-[calc(100%+6px)] bg-[#0d1e38] border border-[rgba(0,180,216,0.2)] rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] min-w-[200px] z-[100] overflow-hidden">
+                <div
+                  ref={dropdownRef}
+                  style={{
+                    position: 'fixed',
+                    top: dropdownPos.top,
+                    right: dropdownPos.right,
+                    zIndex: 1000,
+                    background: '#ffffff',
+                    border: '1px solid rgba(0,180,216,0.25)',
+                    borderRadius: 10,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+                    minWidth: 200,
+                    overflow: 'hidden',
+                  }}
+                >
                   {[
                     { icon: '🌊', label: 'New Simulation', action: handleReset,     testId: 'menu-new'  },
                     { icon: '💾', label: 'Save State',     action: handleSave,      testId: 'menu-save' },
@@ -94,7 +121,7 @@ function App() {
                       key={item.label}
                       onClick={item.action}
                       data-testid={item.testId}
-                      className="flex items-center gap-2.5 w-full py-3 px-4 bg-transparent border-none text-[#e8f4f8] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.1)]"
+                      className="flex items-center gap-2.5 w-full py-3 px-4 bg-transparent border-none text-[#0a1628] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.08)]"
                     >
                       <span className="text-base">{item.icon}</span>
                       {item.label}
@@ -103,7 +130,7 @@ function App() {
                   <div className="h-px bg-[rgba(0,180,216,0.15)] my-1" />
                   <button
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2.5 w-full py-3 px-4 bg-transparent border-none text-[#7a9bb5] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.05)]"
+                    className="flex items-center gap-2.5 w-full py-3 px-4 bg-transparent border-none text-[#5a7a96] text-sm cursor-pointer text-left hover:bg-[rgba(0,180,216,0.05)]"
                   >
                     <span className="text-base">ℹ️</span>
                     About — v1.0.0
@@ -137,9 +164,9 @@ function App() {
         <ConfigPanel onStart={handleStart} />
       ) : (
         <>
-          <div className="relative h-[calc(100vh-64px-72px)] w-full">
+          <div className="relative flex-1 min-h-0 w-full overflow-hidden">
             {/* Ocean grid — full size */}
-            <div className="w-full h-full overflow-auto flex items-center justify-center p-4 bg-[#0a1628]" data-testid="simulation-view">
+            <div className="w-full h-full overflow-auto flex items-center justify-center p-4 bg-[#f0f5fa]" data-testid="simulation-view">
               {sim.state.grid
                 ? <OceanGrid grid={sim.state.grid} changedCells={changedCells} />
                 : <div className="text-center text-[#7a9bb5]">
@@ -152,8 +179,8 @@ function App() {
             {/* Stats panel — floating glass overlay */}
             <StatsPanel state={sim.state} />
           </div>
-          {/* Fixed bottom footer with simulation controls */}
-          <footer className="fixed bottom-0 left-0 right-0 bg-[#0f1f3d] border-t border-[rgba(0,180,216,0.2)] z-20">
+          {/* Bottom footer — in-flow flex child */}
+          <footer className="shrink-0 relative z-20 h-14 flex items-center bg-white border-t border-[#d0dde8]">
             <SimulationControls
               variant="footer"
               isRunning={sim.state.isRunning}

@@ -5,6 +5,7 @@ import { simulationApi } from '../services/simulationApi';
 type SimulationAction =
   | { type: 'INITIALIZED'; grid: OceanGrid; config: SimulationConfig }
   | { type: 'SNAPSHOT_COMPLETED'; result: SnapshotResult }
+  | { type: 'SNAPSHOT_PROGRESS'; result: SnapshotResult }
   | { type: 'RUNNING'; isRunning: boolean }
   | { type: 'LOADED'; result: SnapshotResult };
 
@@ -38,6 +39,25 @@ function simulationReducer(state: SimulationState, action: SimulationAction): Si
         ...initialState,
         grid: action.grid,
         config: action.config,
+      };
+    case 'SNAPSHOT_PROGRESS':
+      return {
+        ...state,
+        snapshotNumber: action.result.snapshotNumber,
+        grid: action.result.grid,
+        populationHistory: [
+          ...state.populationHistory,
+          { snapshot: action.result.snapshotNumber, ...action.result.populationCounts }
+        ],
+        birthsHistory: [
+          ...state.birthsHistory,
+          { snapshot: action.result.snapshotNumber, births: action.result.totalBirths }
+        ],
+        deathsHistory: [
+          ...state.deathsHistory,
+          { snapshot: action.result.snapshotNumber, deaths: action.result.totalDeaths }
+        ],
+        isRunning: true,
       };
     case 'SNAPSHOT_COMPLETED':
       return {
@@ -107,8 +127,14 @@ export function useSimulation() {
   const runNSnapshots = async (n: number) => {
     dispatch({ type: 'RUNNING', isRunning: true });
     try {
-      const result = await simulationApi.runNSnapshots(n);
-      dispatch({ type: 'SNAPSHOT_COMPLETED', result });
+      for (let i = 0; i < n; i++) {
+        const result = await simulationApi.runSnapshot();
+        if (i < n - 1) {
+          dispatch({ type: 'SNAPSHOT_PROGRESS', result });
+        } else {
+          dispatch({ type: 'SNAPSHOT_COMPLETED', result });
+        }
+      }
     } catch (error) {
       console.error('Failed to run N snapshots:', error);
       dispatch({ type: 'RUNNING', isRunning: false });
