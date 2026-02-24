@@ -111,7 +111,25 @@ public class SimulationController : ControllerBase
         for (int i = 0; i < n; i++)
         {
             var result = await _orchestrator.ExecuteSnapshotAsync(_simulationService.Ocean!);
-            results.Add(result);
+            var grid = BuildGridResponse(_simulationService.Ocean!);
+
+            results.Add(new
+            {
+                snapshotNumber = result.SnapshotNumber,
+                populationCounts = new
+                {
+                    plankton    = result.PopulationCounts.GetValueOrDefault(SpecimenType.Plankton, 0),
+                    sardine     = result.PopulationCounts.GetValueOrDefault(SpecimenType.Sardine, 0),
+                    shark       = result.PopulationCounts.GetValueOrDefault(SpecimenType.Shark, 0),
+                    crab        = result.PopulationCounts.GetValueOrDefault(SpecimenType.Crab, 0),
+                    deadSardine = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadSardine, 0),
+                    deadShark   = result.PopulationCounts.GetValueOrDefault(SpecimenType.DeadShark, 0)
+                },
+                totalBirths         = result.TotalBirths,
+                totalDeaths         = result.TotalDeaths,
+                isExtinctionReached = result.IsExtinctionReached,
+                grid
+            });
             
             if (result.IsExtinctionReached)
                 break;
