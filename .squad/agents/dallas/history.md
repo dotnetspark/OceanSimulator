@@ -123,3 +123,19 @@ The Ocean Simulator models a marine ecosystem as a 2D grid. Species include Plan
 
 **Commit:** c861150
 
+### 2026-02-24: Implemented RunUntilEvent endpoint (POST /api/simulation/run/event)
+
+**What changed:**
+- Replaced stub `RunUntilEvent([FromBody] string eventType)` with full implementation
+- Removed `[FromBody] string eventType` parameter (frontend sends no body)
+- Loops up to 10,000 snapshots via `_orchestrator.ExecuteSnapshotAsync`; returns on first snapshot where `TotalBirths > 0 || TotalDeaths > 0 || IsExtinctionReached`
+- Response shape matches other endpoints: `snapshotNumber`, `populationCounts` (camelCase flat object), `totalBirths`, `totalDeaths`, `isExtinctionReached`, `grid`
+- Fallback returns last state after maxIterations with `snapshotNumber = maxIterations`
+
+**Key learnings:**
+- `SnapshotResult` fields are `TotalBirths` and `TotalDeaths` (not `Births`/`Deaths`)
+- AppHost locking its own .exe during a running Aspire session causes `dotnet build` on the full `.sln` to fail with MSB3027; building the individual `.csproj` confirms code correctness with 0 errors
+- Always remove `[FromBody]` parameters when the frontend sends no request body to avoid 400 errors
+
+**Commit:** ee97d24
+

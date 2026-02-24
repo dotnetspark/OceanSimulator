@@ -1328,3 +1328,5 @@ proxy: {
 - `frontend/vite.config.ts` — proxy configuration
 - `frontend/src/hooks/useSignalR.ts` — SignalR connection code
 
+
+
