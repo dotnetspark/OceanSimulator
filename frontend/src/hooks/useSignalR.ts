@@ -7,7 +7,7 @@ export function useSignalR(onEvent: (event: OceanEvent) => void) {
 
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_API_URL ?? 'http://localhost:5000'}/hubs/simulation`)
+      .withUrl(`${import.meta.env.VITE_API_URL ?? ''}/hubs/simulation`)
       .withAutomaticReconnect()
       .build();
 
