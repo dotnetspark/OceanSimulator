@@ -26,15 +26,12 @@ public class Shark : EnergeticSpecimen
         if (sardineCells.Any())
         {
             var targetPosition = random.Choose(sardineCells);
-            var sardine = ocean.GetSpecimenAt(targetPosition);
-            ocean.RemoveSpecimen(targetPosition);
-            var corpse = new DeadSardine(targetPosition);
-            ocean.AddSpecimen(corpse);
-            
-            ocean.RemoveSpecimen(Position);
-            Position = targetPosition;
-            ocean.RemoveSpecimen(Position);
-            ocean.AddSpecimen(this);
+            var eatFrom = oldPosition;
+            ocean.RemoveSpecimen(targetPosition);   // remove live sardine
+            ocean.RemoveSpecimen(Position);          // remove shark from old cell
+            Position = targetPosition;               // shark moves to sardine's cell
+            ocean.AddSpecimen(this);                 // shark registered at new cell
+            ocean.AddSpecimen(new DeadSardine(eatFrom)); // remains left behind
             
             EnergyCounter = EnergyThreshold;
             Weight++;

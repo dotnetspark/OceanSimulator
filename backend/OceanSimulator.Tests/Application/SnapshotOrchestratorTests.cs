@@ -81,13 +81,13 @@ public class SnapshotOrchestratorTests
     [Fact]
     public async Task Snapshot_ReturnsCorrectPopulationCounts()
     {
-        // Arrange
+        // Arrange: specimens placed so no feeding occurs in one snapshot; high thresholds prevent breeding
         var ocean = OceanTestBuilder.CreateEmpty(5, 5);
-        ocean.AddSpecimen(new Plankton(new Position(0, 0)));
-        ocean.AddSpecimen(new Plankton(new Position(0, 1)));
-        ocean.AddSpecimen(new Sardine(new Position(1, 0)));
-        ocean.AddSpecimen(new Shark(new Position(2, 0)));
-        ocean.AddSpecimen(new Crab(new Position(3, 0)));
+        ocean.AddSpecimen(new Plankton(new Position(0, 0)) { BreedingThreshold = 100 });
+        ocean.AddSpecimen(new Plankton(new Position(0, 4)) { BreedingThreshold = 100 });
+        ocean.AddSpecimen(new Sardine(new Position(4, 4)) { BreedingThreshold = 100, EnergyThreshold = 10, EnergyCounter = 10 });
+        ocean.AddSpecimen(new Shark(new Position(4, 0)) { BreedingThreshold = 100, EnergyThreshold = 10, EnergyCounter = 10 });
+        ocean.AddSpecimen(new Crab(new Position(2, 2)));
         
         var random = new MockRandomProvider(Enumerable.Range(0, 100).ToArray());
         var publisherMock = new Mock<IOceanEventPublisher>();

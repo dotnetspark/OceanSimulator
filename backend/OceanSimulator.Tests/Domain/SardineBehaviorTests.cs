@@ -27,7 +27,7 @@ public class SardineBehaviorTests
         sardine.ExecuteMove(ocean, random);
         
         // Assert: Plankton removed, Sardine at Plankton's position, energy reset
-        Assert.Null(ocean.GetSpecimenAt(new Position(1, 2)));
+        Assert.Equal(SpecimenType.Sardine, ocean.GetSpecimenAt(new Position(1, 2))?.Type);
         Assert.Equal(new Position(1, 2), sardine.Position);
         Assert.Equal(5, sardine.EnergyCounter);
         Assert.Equal(1, sardine.BreedingCounter);
