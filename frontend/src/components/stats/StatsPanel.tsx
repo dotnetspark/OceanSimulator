@@ -2,22 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { PopulationGraph } from './PopulationGraph';
 import { BirthDeathGraph } from './BirthDeathGraph';
 import { PopulationPieChart } from './PopulationPieChart';
-import { PlanktonSvg } from '../species/PlanktonSvg';
-import { SardineSvg } from '../species/SardineSvg';
-import { SharkSvg } from '../species/SharkSvg';
-import { CrabSvg } from '../species/CrabSvg';
 import type { SimulationState } from '../../types/simulation.types';
 
 interface StatsPanelProps {
   state: SimulationState;
 }
-
-const SPECIES_BADGES = [
-  { key: 'plankton', Icon: PlanktonSvg, color: '#7ec8a0' },
-  { key: 'sardine',  Icon: SardineSvg,  color: '#89b4d8' },
-  { key: 'shark',    Icon: SharkSvg,    color: '#8899aa' },
-  { key: 'crab',     Icon: CrabSvg,     color: '#e07b39' },
-] as const;
 
 const INIT_RIGHT = 16;
 const INIT_TOP = 80;

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
-import { SimulationConfig } from '../types/simulation.types';
+import type { SimulationConfig } from '../types/simulation.types';
 
 // Mock ConfigPanel component
 const ConfigPanel = ({

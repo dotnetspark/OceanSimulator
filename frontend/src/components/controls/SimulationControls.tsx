@@ -2,8 +2,6 @@ import { useState, useRef } from 'react';
 
 const PANEL_BG = '#ffffff';
 const BORDER = '#d0dde8';
-const ACCENT = '#00b4d8';
-const MUTED = '#5a7a96';
 
 interface SimulationControlsProps {
   isRunning: boolean;

@@ -13,7 +13,8 @@ const SimulationControls = ({
   onRunToExtinction: () => void;
   isRunning: boolean;
 }) => {
-  const [nValue, setNValue] = vi.fn(() => 10)();
+  const nValue = 10;
+  const setNValue = vi.fn();
 
   return (
     <div data-testid="simulation-controls">
