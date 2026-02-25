@@ -8,11 +8,6 @@ import { StatsPanel } from './components/stats/StatsPanel';
 import type { SimulationConfig } from './types/simulation.types';
 import './App.css';
 
-const BG = '#0a1628';
-const PANEL_BG = '#0f1f3d';
-const BORDER = 'rgba(0,180,216,0.2)';
-const ACCENT = '#00b4d8';
-
 function App() {
   const sim = useSimulation();
   const changedCells = useGridDiff(sim.state.grid);

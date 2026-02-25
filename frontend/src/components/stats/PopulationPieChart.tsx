@@ -107,9 +107,10 @@ export function PopulationPieChart({ plankton, sardine, shark, crab }: Populatio
                   fontSize: 11,
                   borderRadius: 4,
                 }}
-                formatter={(value: number, name: string) => {
-                  const percentage = ((value as number / total) * 100).toFixed(0);
-                  return [`${getEmoji(name)} ${name}: ${value} (${percentage}%)`, ''];
+                formatter={(value: number | undefined, name: string | undefined) => {
+                  if (value == null) return ['', ''];
+                  const percentage = ((value / total) * 100).toFixed(0);
+                  return [`${getEmoji(name ?? '')} ${name ?? ''}: ${value} (${percentage}%)`, ''];
                 }}
                 labelFormatter={() => ''}
               />

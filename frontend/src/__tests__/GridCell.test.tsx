@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { SpecimenType } from '../types/simulation.types';
+import type { SpecimenType } from '../types/simulation.types';
 
 // Mock GridCell component for testing
 const GridCell = ({ specimenType, size }: { specimenType: SpecimenType; size: number }) => {

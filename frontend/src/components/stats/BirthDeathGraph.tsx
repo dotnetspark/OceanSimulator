@@ -50,7 +50,8 @@ export function BirthDeathGraph({ birthsData, deathsData }: BirthDeathGraphProps
           <ReferenceLine y={0} stroke="rgba(255,255,255,0.2)" />
           <Tooltip 
             contentStyle={{ background: palette.panelBg, border: `1px solid ${palette.accent}`, fontSize: 11 }} 
-            formatter={(value: number) => {
+            formatter={(value: number | undefined) => {
+              if (value == null) return '';
               const n = Math.abs(value);
               return value > 0 ? `+${n} new` : value < 0 ? `−${n} lost` : '0';
             }}
