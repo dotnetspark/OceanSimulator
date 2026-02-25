@@ -27,8 +27,8 @@ public class SharkBehaviorTests
         // Act
         shark.ExecuteMove(ocean, random);
         
-        // Assert: Sardine removed, DeadSardine created at old Sardine pos, Shark moved
-        var deadSardine = ocean.GetSpecimenAt(new Position(1, 2));
+        // Assert: Sardine removed, DeadSardine left at shark's old position, Shark moved
+        var deadSardine = ocean.GetSpecimenAt(new Position(1, 1)); // shark's old position
         Assert.NotNull(deadSardine);
         Assert.Equal(SpecimenType.DeadSardine, deadSardine.Type);
         Assert.Equal(new Position(1, 2), shark.Position);
@@ -153,11 +153,7 @@ public class SharkBehaviorTests
         shark.Weight = 3;
         ocean.AddSpecimen(shark);
         
-        // Add another shark far away so attack doesn't trigger
-        var otherShark = new Shark(new Position(0, 0));
-        ocean.AddSpecimen(otherShark);
-        
-        var random = new MockRandomProvider(new[] { 5 }); // Move away from other shark
+        var random = new MockRandomProvider(new[] { 5 }); // Move to (2,0)
         
         // Act
         shark.ExecuteMove(ocean, random);
@@ -214,7 +210,7 @@ public class SharkBehaviorTests
         shark.ExecuteMove(ocean, random);
         
         // Assert: Shark ate Sardine (priority 1), not attack (priority 2)
-        var deadSardine = ocean.GetSpecimenAt(new Position(1, 0));
+        var deadSardine = ocean.GetSpecimenAt(new Position(1, 1)); // shark's old position
         Assert.NotNull(deadSardine);
         Assert.Equal(SpecimenType.DeadSardine, deadSardine.Type);
         Assert.Equal(new Position(1, 0), shark.Position);

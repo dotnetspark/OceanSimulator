@@ -26,7 +26,7 @@ public class CrabBehaviorTests
         
         // Assert: Crab moved to DeadSardine position, DeadSardine removed
         Assert.Equal(new Position(1, 2), crab.Position);
-        Assert.Null(ocean.GetSpecimenAt(new Position(1, 2)));
+        Assert.Equal(SpecimenType.Crab, ocean.GetSpecimenAt(new Position(1, 2))?.Type);
     }
     
     [Fact]
@@ -47,7 +47,7 @@ public class CrabBehaviorTests
         
         // Assert: Crab moved to DeadShark position, DeadShark removed
         Assert.Equal(new Position(1, 2), crab.Position);
-        Assert.Null(ocean.GetSpecimenAt(new Position(1, 2)));
+        Assert.Equal(SpecimenType.Crab, ocean.GetSpecimenAt(new Position(1, 2))?.Type);
     }
     
     [Fact]
