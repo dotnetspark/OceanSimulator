@@ -1,5 +1,9 @@
 # Ocean Simulator — Full Project Prompt
 
+> This is the initial prompt submitted by Yadel Lopez ([@dotnetspark](https://github.com/dotnetspark)) to bootstrap the Ocean Simulator project using Squad v0.5.2 on 2026-02-23.
+
+---
+
 ## Overview
 Implement a full‑stack Ocean Simulator consisting of:
 
@@ -252,3 +256,20 @@ The SVGs must be:
 - CI pipeline gates merges
 - Branch protection on main (require PR + passing checks)
 - README with badges for CI, license, runtime versions
+
+
+---
+
+# Team
+
+This project was built by the **Squad** AI team assembled for this prompt:
+
+| Agent | Role | Responsibility |
+|-------|------|----------------|
+| **Ripley** | Tech Lead | Architecture decisions, code review, integration |
+| **Dallas** | Backend Engineer | C# Clean Architecture, domain logic, API |
+| **Parker** | Frontend Engineer | React/TypeScript UI, Vite, Recharts |
+| **Lambert** | Visual Designer | SVG species illustrations, UI/UX, theme |
+| **Ash** | QA / Test Engineer | xUnit, Vitest, Playwright e2e coverage |
+| **Scribe** | Documentation | README, badges, inline docs |
+| **Ralph** | DevOps | GitHub Actions CI, branch protection, Aspire |
